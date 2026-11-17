@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Website Recovery — Tiny Artist</title>
+<meta name="robots" content="noindex, nofollow">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;background:#fff;color:#263448;line-height:1.55;padding:32px 20px}
+.card{max-width:560px;margin:0 auto;border:1.5px solid #e5e0d8;border-radius:16px;padding:28px}
+h1{font-size:1.4rem;margin-bottom:8px}
+p{margin:10px 0;font-size:.95rem;color:#5b6b82}
+p strong{color:#263448}
+.status{background:#f7f5f1;border-radius:12px;padding:14px 16px;margin:16px 0;font-size:.92rem}
+.status b{display:inline-block;min-width:150px}
+label{display:block;font-weight:700;font-size:.9rem;margin:14px 0 5px}
+input[type=text]{width:100%;border:1.5px solid #e5e0d8;border-radius:10px;padding:11px 13px;font:inherit}
+.check{display:flex;gap:8px;align-items:flex-start;font-weight:700;font-size:.9rem;margin-top:14px}
+.check input{width:auto;margin-top:4px}
+.err{color:#b3261e;font-size:.88rem;font-weight:700;margin-top:8px;display:none}
+.btn{display:inline-block;border:none;border-radius:999px;padding:12px 22px;font-weight:800;font-size:1rem;background:#263448;color:#fff;cursor:pointer;margin-top:16px}
+.btn.alt{background:#fff;color:#263448;border:2px solid #263448;margin-left:8px}
+.ok{background:#e8f4ec;border:1.5px solid #92d8c2;border-radius:12px;padding:12px 16px;margin-top:16px;display:none}
+.warn{background:#fdf3d8;border:1.5px solid #f5cb68;border-radius:12px;padding:12px 16px;margin-top:16px;display:none}
+a{color:#263448;font-weight:700}
+</style>
+</head>
+<body>
+<div class="card">
+  <h1>Website Recovery</h1>
+  <p>This separate recovery page restores the Tiny Artist website after an emergency deactivation. <strong>It deletes nothing</strong> — no source code, database records, or repository content is touched. It only clears the deactivation flag.</p>
+  <div class="status" id="statusbox">Checking status…</div>
+  <button class="btn alt" id="refreshbtn" type="button">Refresh status</button>
+
+  <label for="restoretype">Type <strong>RESTORE</strong> to confirm recovery</label>
+  <input type="text" id="restoretype" autocomplete="off" maxlength="10">
+  <label class="check"><input type="checkbox" id="restoreack"> I am an authorized administrator and I intend to make the public website visible again.</label>
+  <p class="err" id="restoreerr"></p>
+  <button class="btn" id="restorebtn" type="button">Restore Website</button>
+  <a class="btn alt" href="index.html">Back to website</a>
+  <div class="ok" id="okbox"></div>
+  <div class="warn" id="warnbox"></div>
+  <p style="margin-top:20px">If the server status still says deactivated after restoring here, the site will stay blank until the server state changes: set <strong>deactivated: false</strong> in the deployed <strong>site-status.json</strong> and redeploy, or — once the backend is connected — set <strong>site_settings.deactivated = false</strong> in Supabase (see SETUP.md). In backend mode, restore requires a signed-in admin session; without one, this page clears only this browser's local flag.</p>
+</div>
+<script src="supabase-config.js"></script>
+<script>
+"use strict";
+/* Recovery config mirrors index.html. BACKEND enabled=false: no server is
+   wired yet, so this page manages the local flag + reports server status. */
+var BACKEND = {enabled: false, statusApi: ""};
+var box = document.getElementById("statusbox");
+var okbox = document.getElementById("okbox");
+var warnbox = document.getElementById("warnbox");
+var errEl = document.getElementById("restoreerr");
+
+function localFlag() {
+  try { return JSON.parse(localStorage.getItem("ta-deactivated") || "false") === true; }
+  catch (e) { return false; }
+}
+var serverSource = "status file";
+async function serverStatus() {
+  try {
+    var sb = (typeof window !== "undefined") ? window.TINY_ARTIST_SUPABASE : null;
+    if (sb && sb.configured && typeof sb.fetchDeactivated === "function") {
+      var d = await sb.fetchDeactivated();
+      if (d === true || d === false) { serverSource = "Supabase database"; return d; }
+    }
+  } catch (e) {}
+  try {
+    var r = await fetch("site-status.json?v=" + Date.now(), {cache: "no-store"});
+    if (!r.ok) return null;
+    var s = await r.json();
+    serverSource = "status file";
+    return !!(s && s.deactivated === true);
+  } catch (e) { return null; }
+}
+async function refresh() {
+  var srv = await serverStatus();
+  var loc = localFlag();
+  box.innerHTML = "<b>Server status (" + serverSource + "):</b> " + (srv === null ? "could not be read" : (srv ? "DEACTIVATED" : "active"))
+    + "<br><b>This browser flag:</b> " + (loc ? "DEACTIVATED" : "active")
+    + "<br><b>Backend mode:</b> " + (BACKEND.enabled ? "server-controlled" : "not connected (local only)");
+  return {server: srv, local: loc};
+}
+function show(el, msg) { el.textContent = msg; el.style.display = "block"; }
+function hide(el) { el.textContent = ""; el.style.display = "none"; }
+
+document.getElementById("refreshbtn").onclick = function () { hide(okbox); hide(warnbox); refresh(); };
+
+document.getElementById("restorebtn").onclick = async function () {
+  var typed = document.getElementById("restoretype").value;
+  var ack = document.getElementById("restoreack").checked;
+  hide(okbox); hide(warnbox);
+  if (!(typed === "RESTORE" && ack === true)) {
+    show(errEl, "Type RESTORE exactly and tick the confirmation box to proceed.");
+    return;
+  }
+  hide(errEl);
+  if (!window.confirm("Restore the public website? It will become visible again immediately.")) return;
+
+  if (BACKEND.enabled && BACKEND.statusApi) {
+    try {
+      var headers = {"Content-Type": "application/json"};
+      if (window.supabaseClient) {
+        var s = await window.supabaseClient.auth.getSession();
+        var t = s && s.data && s.data.session && s.data.session.access_token;
+        if (t) headers.Authorization = "Bearer " + t;
+      }
+      if (!headers.Authorization) {
+        show(warnbox, "No signed-in admin session was found. The server was NOT changed. The local flag below was cleared, but the site stays blank until an admin restores it from the server (Supabase dashboard or a signed-in restore here).");
+        try { localStorage.setItem("ta-deactivated", "false"); } catch (e) {}
+        refresh();
+        return;
+      }
+      var r = await fetch(BACKEND.statusApi, {method: "POST", headers: headers, body: JSON.stringify({deactivated: false, reason: "Restored from recovery page"})});
+      if (!r.ok) throw new Error("status " + r.status);
+      try { localStorage.setItem("ta-deactivated", "false"); } catch (e) {}
+      show(okbox, "Website restored on the server. Open the website to confirm it is visible again.");
+      refresh();
+      return;
+    } catch (e) {
+      show(warnbox, "Server restore failed (" + e.message + "). Nothing was changed on the server. Check the backend, then try again.");
+      return;
+    }
+  }
+
+  try { localStorage.setItem("ta-deactivated", "false"); } catch (e) {}
+  var st = await refresh();
+  if (st.server === true) {
+    show(warnbox, "Local flag cleared, but the server status file still says DEACTIVATED, so the site will stay blank for everyone until site-status.json is set back to active and redeployed (or the database flag is cleared once the backend is connected).");
+  } else {
+    show(okbox, "Website restored on this device. Open the website to confirm it is visible again.");
+  }
+};
+
+refresh();
+</script>
+</body>
+</html>

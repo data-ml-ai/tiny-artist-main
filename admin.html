@@ -1,0 +1,1065 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tiny Artist — Admin</title>
+<meta name="description" content="Tiny Artist admin panel. Authorised admins only.">
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" type="image/png" href="assets/logo.png">
+<meta name="theme-color" content="#FFF8EE">
+<style>
+:root{--canvas:#FFF8EE;--ink:#263448;--coral:#F17F70;--sun:#F5CB68;--mint:#92D8C2;--sky:#A9D7EF;--lilac:#C5B2E8;--white:#fff;--muted:#5b6b82;--line:#f0e3d3;--radius:20px;--green:#2e7d4f;--red:#c0392b;--amber:#b7791f}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Nunito Sans",system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--canvas);color:var(--ink);line-height:1.55}
+h1,h2,h3,.brand{font-family:Fredoka,"Baloo 2",system-ui,sans-serif;font-weight:600;letter-spacing:.2px}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit;cursor:pointer}
+img{max-width:100%}
+.btn{display:inline-block;border:none;border-radius:999px;padding:12px 22px;font-weight:800;font-size:.95rem;background:var(--coral);color:#fff;box-shadow:0 6px 16px rgba(241,127,112,.35)}
+.btn:hover{filter:brightness(1.05)}
+.btn.alt{background:#fff;color:var(--ink);border:2px solid var(--ink);box-shadow:none}
+.btn.small{padding:8px 16px;font-size:.88rem}
+.btn.danger{background:var(--red);box-shadow:none}
+.btn:disabled{opacity:.55;cursor:not-allowed}
+.pillbtn{border:1.5px solid var(--line);background:#fff;border-radius:999px;padding:7px 14px;font-weight:700;font-size:.86rem}
+.pillbtn.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.pillbtn:hover{border-color:var(--ink)}
+.ghostbtn{border:2px solid var(--ink);background:#fff;border-radius:999px;padding:8px 16px;font-weight:800;font-size:.88rem}
+.field{margin:0 0 14px}
+.field label{display:block;font-weight:700;font-size:.9rem;margin-bottom:5px}
+.field input,.field select,.field textarea{width:100%;border:1.5px solid var(--line);border-radius:12px;padding:10px 12px;background:#fff;font:inherit;font-size:.95rem;color:var(--ink)}
+.field input:focus,.field select:focus,.field textarea:focus{outline:2px solid var(--sky);border-color:var(--sky)}
+.field .hint{font-size:.83rem;color:var(--muted);margin-top:4px}
+.notice{border-radius:14px;padding:14px 16px;margin:14px 0;font-size:.93rem}
+.notice.info{background:#eef6fd;border:1.5px solid var(--sky)}
+.notice.warn{background:#fdf6e3;border:1.5px solid var(--sun)}
+.notice.demo{background:#fdeceb;border:1.5px solid #f5b7b1}
+.err{color:var(--red);font-weight:700;font-size:.9rem;min-height:1.2em}
+.muted{color:var(--muted)}
+/* Gate + login */
+.center{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+.authcard{background:#fff;border:1.5px solid var(--line);border-radius:28px;box-shadow:0 18px 40px rgba(38,52,72,.10);max-width:430px;width:100%;padding:34px 30px;text-align:center}
+.authcard .dot{width:52px;height:52px;border-radius:50%;background:conic-gradient(var(--coral) 0 25%,var(--sun) 0 50%,var(--mint) 0 75%,var(--sky) 0);display:inline-block;border:4px solid #fff;box-shadow:0 2px 8px rgba(38,52,72,.18)}
+.authcard h1{font-size:1.6rem;margin:12px 0 4px}
+.authcard p.sub{color:var(--muted);font-size:.92rem;margin-bottom:20px}
+.authcard form{text-align:left}
+.authcard .foot{margin-top:18px;font-size:.85rem;color:var(--muted)}
+.lock{font-size:2rem}
+/* Shell */
+.layout{display:flex;min-height:100vh}
+.sidebar{width:248px;flex-shrink:0;background:#fff;border-right:1.5px solid var(--line);padding:20px 14px;position:sticky;top:0;height:100vh;overflow-y:auto}
+.sidebar .brand{font-size:1.3rem;display:flex;align-items:center;gap:9px;padding:0 8px 18px}
+.sidebar .brand .dot{width:32px;height:32px;border-radius:50%;background:conic-gradient(var(--coral) 0 25%,var(--sun) 0 50%,var(--mint) 0 75%,var(--sky) 0);display:inline-block;border:3px solid #fff;box-shadow:0 2px 8px rgba(38,52,72,.18)}
+.sidenav{display:flex;flex-direction:column;gap:4px}
+.sidenav button{display:flex;align-items:center;gap:11px;border:none;background:transparent;text-align:left;padding:10px 12px;border-radius:12px;font-weight:700;font-size:.94rem;color:var(--ink)}
+.sidenav button:hover{background:var(--canvas)}
+.sidenav button.on{background:var(--ink);color:#fff}
+.sidenav button .ic{width:22px;text-align:center}
+.sidenav .sect{font-size:.72rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:14px 12px 5px}
+.main{flex:1;min-width:0;padding:0 26px 40px}
+.topbar{position:sticky;top:0;z-index:40;background:rgba(255,248,238,.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:14px;padding:14px 0;margin-bottom:22px}
+.topbar h1{font-size:1.35rem}
+.topbar .spacer{flex:1}
+.searchbox{display:flex;gap:6px}
+.searchbox input{border:1.5px solid var(--line);border-radius:999px;padding:9px 14px;background:#fff;font:inherit;font-size:.9rem;width:210px}
+.iconbtn{position:relative;border:1.5px solid var(--line);background:#fff;border-radius:50%;width:40px;height:40px;font-size:1.05rem}
+.iconbtn .n{position:absolute;top:-6px;right:-6px;background:var(--coral);color:#fff;border-radius:999px;font-size:.7rem;font-weight:800;padding:2px 7px}
+.profile{display:flex;align-items:center;gap:10px;background:#fff;border:1.5px solid var(--line);border-radius:999px;padding:6px 14px 6px 6px;font-weight:700;font-size:.88rem}
+.profile .av{width:30px;height:30px;border-radius:50%;background:var(--sun);display:flex;align-items:center;justify-content:center;font-weight:800}
+.hamb{display:none;border:1.5px solid var(--line);background:#fff;border-radius:10px;padding:8px 11px;font-size:1rem}
+.notifdrop{position:absolute;right:0;top:48px;background:#fff;border:1.5px solid var(--line);border-radius:16px;box-shadow:0 18px 40px rgba(38,52,72,.16);width:330px;max-width:90vw;padding:10px;z-index:60}
+.notifdrop h3{padding:6px 8px 10px}
+.notifdrop .ni{padding:9px 8px;border-top:1px solid var(--line);font-size:.9rem}
+.notifdrop .ni:first-of-type{border-top:none}
+/* Cards, tables */
+.statgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin-bottom:20px}
+.stat{background:#fff;border:1.5px solid var(--line);border-radius:20px;padding:18px}
+.stat .lbl{font-size:.82rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+.stat .val{font-family:Fredoka,"Baloo 2",system-ui,sans-serif;font-size:1.7rem;font-weight:600;margin:4px 0 2px}
+.stat .sub2{font-size:.85rem;color:var(--muted)}
+.panel{background:#fff;border:1.5px solid var(--line);border-radius:20px;padding:20px;margin-bottom:18px}
+.panel h2{font-size:1.2rem;margin-bottom:4px}
+.panel h3{font-size:1.05rem;margin-bottom:8px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+table{width:100%;border-collapse:collapse;font-size:.92rem}
+th,td{text-align:left;padding:10px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:.78rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+tr:last-child td{border-bottom:none}
+.badge{display:inline-block;border-radius:999px;padding:3px 11px;font-size:.78rem;font-weight:800}
+.badge.pending{background:#fdf6e3;color:var(--amber)}
+.badge.confirmed{background:#eef6fd;color:#2563a8}
+.badge.processing{background:#f1eafd;color:#6b4fa8}
+.badge.completed{background:#e6f4ec;color:var(--green)}
+.badge.cancelled{background:#fdeceb;color:var(--red)}
+.badge.ok{background:#e6f4ec;color:var(--green)}
+.badge.low{background:#fdeceb;color:var(--red)}
+.badge.super{background:var(--ink);color:#fff}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+.toolbar input,.toolbar select{border:1.5px solid var(--line);border-radius:999px;padding:9px 14px;background:#fff;font:inherit;font-size:.9rem}
+.toolbar .spacer{flex:1}
+.thumb{width:52px;height:52px;object-fit:cover;border-radius:12px;border:1.5px solid var(--line);background:#fff}
+.thumb.glyph{display:flex;align-items:center;justify-content:center;font-size:1.5rem}
+.empty{padding:34px 16px;text-align:center;color:var(--muted)}
+.empty .big{font-size:2rem;margin-bottom:8px}
+.modal{position:fixed;inset:0;background:rgba(38,52,72,.45);display:flex;align-items:flex-start;justify-content:center;padding:30px 16px;z-index:100;overflow-y:auto}
+.modalcard{background:#fff;border-radius:24px;max-width:640px;width:100%;padding:26px;box-shadow:0 24px 60px rgba(0,0,0,.25)}
+.modalcard h2{margin-bottom:14px}
+.dropzone{border:2px dashed var(--line);border-radius:16px;padding:22px;text-align:center;color:var(--muted);cursor:pointer}
+.dropzone.over{border-color:var(--coral);color:var(--ink)}
+.dropzone img{max-height:160px;border-radius:12px;margin-top:10px}
+.chartbars{display:flex;align-items:flex-end;gap:8px;height:150px;padding-top:10px}
+.chartbars .bar{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0}
+.chartbars .bar .fill{width:100%;max-width:44px;background:linear-gradient(var(--sun),var(--coral));border-radius:8px 8px 0 0;min-height:4px}
+.chartbars .bar .dl{font-size:.72rem;color:var(--muted);white-space:nowrap}
+.kv{display:grid;grid-template-columns:150px 1fr;gap:6px 14px;font-size:.93rem}
+.kv dt{color:var(--muted)}
+.toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);background:var(--ink);color:#fff;border-radius:999px;padding:11px 20px;font-weight:700;z-index:200;opacity:0;pointer-events:none;transition:opacity .25s}
+.toast.show{opacity:1}
+@media(max-width:900px){
+  .grid2{grid-template-columns:1fr}
+  .sidebar{position:fixed;left:0;top:0;z-index:90;transform:translateX(-100%);transition:transform .25s;box-shadow:0 0 60px rgba(0,0,0,.2)}
+  .sidebar.open{transform:none}
+  .hamb{display:block}
+  .main{padding:0 16px 40px}
+  .searchbox input{width:130px}
+  .topbar h1{font-size:1.1rem}
+  .profile .em{display:none}
+}
+</style>
+</head>
+<body>
+
+<!-- ============ ACCESS CODE GATE ============ -->
+<div id="gate" class="center" style="display:none">
+  <div class="authcard">
+    <span class="dot"></span>
+    <h1>Admin Access</h1>
+    <p class="sub">This area is for Tiny Artist admins only.<br>Enter the security access code to open the panel.</p>
+    <div id="gate-msg"></div>
+    <form id="gate-form">
+      <div class="field">
+        <label for="gate-code">Security access code</label>
+        <input id="gate-code" type="password" inputmode="text" autocomplete="off" placeholder="Enter the access code" required>
+      </div>
+      <p class="err" id="gate-err"></p>
+      <button class="btn" type="submit" id="gate-btn" style="width:100%">Continue</button>
+    </form>
+    <p class="foot">The code is verified on the server and is never stored in this page.<br><a href="/" style="text-decoration:underline;font-weight:700">Back to the Tiny Artist store</a></p>
+  </div>
+</div>
+
+<!-- ============ ADMIN SHELL ============ -->
+<div id="shell" class="layout" style="display:none">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand"><span class="dot"></span>Tiny Artist <span class="badge" style="background:var(--sun)">Admin</span></div>
+    <nav class="sidenav" id="sidenav"></nav>
+    <div style="padding:18px 8px 0;font-size:.82rem;color:var(--muted)">Access<br><strong style="color:var(--ink)">Access code</strong><br><span class="badge super">Admin</span></div>
+  </aside>
+  <div class="main">
+    <div class="topbar">
+      <button class="hamb" id="hamb" aria-label="Menu">☰</button>
+      <h1 id="page-title">Dashboard</h1>
+      <span class="spacer"></span>
+      <div class="searchbox"><input id="top-search" type="search" placeholder="Search orders, products, customers…" aria-label="Search"></div>
+      <div style="position:relative">
+        <button class="iconbtn" id="bell" aria-label="Notifications">🔔<span class="n" id="bell-n" style="display:none">0</span></button>
+        <div class="notifdrop" id="notifdrop" style="display:none"></div>
+      </div>
+      <div class="profile"><span class="av">A</span><span class="em">Admin</span><button class="pillbtn" id="signout-btn">Sign out</button></div>
+    </div>
+    <div id="db-banner"></div>
+    <div id="weak-banner"></div>
+    <div id="content"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<div id="modal-root"></div>
+<script>
+"use strict";
+/* Tiny Artist Admin Panel (code-only).
+ * Security model: the access-code gate is verified by /api/verify-code
+ * (server-side, env var), which returns a signed gate token. Every
+ * panel request goes to /api/admin with that token; the server checks
+ * it before using the service-role key. There are no admin accounts:
+ * the code is the only credential, and the browser never sees any
+ * secret key and never talks to Supabase directly. All data comes
+ * from the server; there is no sample data.
+ */
+var GATE_KEY = "ta-gate";
+var dbDown = false;
+var STORAGE_BASE = "";   // public Storage base URL, from the probe call
+var currentSection = "dashboard";
+var cache = {};          // section data cache
+var catsById = {}, catsBySlug = {};
+
+function $(id){ return document.getElementById(id); }
+function esc(s){ return String(s == null ? "" : s).replace(/[&<>"']/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }
+function pkr(n){ return "Rs. " + Number(n || 0).toLocaleString("en-PK"); }
+function fmtDate(iso){ try{ return new Date(iso).toLocaleString("en-PK", {dateStyle:"medium", timeStyle:"short"}); }catch(e){ return String(iso || ""); } }
+function fmtDay(iso){ try{ return new Date(iso).toLocaleDateString("en-PK", {weekday:"short", day:"numeric", month:"short"}); }catch(e){ return ""; } }
+function toast(msg){ var t = $("toast"); t.textContent = msg; t.classList.add("show"); clearTimeout(t._h); t._h = setTimeout(function(){ t.classList.remove("show"); }, 2800); }
+function show(el, on){ el.style.display = on ? "" : "none"; }
+function emptyState(icon, title, sub){ return '<div class="empty"><div class="big">' + icon + '</div><h3>' + esc(title) + '</h3><p>' + esc(sub) + '</p></div>'; }
+function errState(msg){ return '<div class="notice demo"><strong>Could not load this data.</strong> ' + esc(msg) + '</div>'; }
+function csvDownload(name, rows){
+  var csv = rows.map(function(r){ return r.map(function(c){ var s = String(c == null ? "" : c); return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; }).join(","); }).join("\n");
+  var a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([csv], {type: "text/csv"}));
+  a.download = name; document.body.appendChild(a); a.click(); a.remove();
+}
+function openModal(html){ $("modal-root").innerHTML = '<div class="modal" id="modal"><div class="modalcard">' + html + '</div></div>';
+  $("modal").addEventListener("click", function(e){ if (e.target.id === "modal") closeModal(); }); }
+function closeModal(){ $("modal-root").innerHTML = ""; }
+
+/* ---------------- Server API ---------------- */
+/* All data flows through /api/admin with the gate token. The server
+ * validates the token and the action before touching the database. */
+function gateToken(){ try { return sessionStorage.getItem(GATE_KEY); } catch (e) { return null; } }
+async function api(action, params){
+  var r = await fetch("/api/admin", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: "Bearer " + (gateToken() || "") },
+    body: JSON.stringify(Object.assign({ action: action }, params || {}))
+  });
+  var text = await r.text();
+  var data = null;
+  try { data = text ? JSON.parse(text) : null; } catch (e) {}
+  if (r.status === 401) { signOut(true); throw new Error("Session expired. Enter the access code again."); }
+  if (!r.ok) {
+    var msg = (data && data.error) || ("Request failed (" + r.status + ")");
+    var err = new Error(msg); err.status = r.status; err.data = data; throw err;
+  }
+  return data;
+}
+function ensureGate(){
+  if (!gateTokenValid()) { signOut(true); return false; }
+  return true;
+}
+
+/* ---------------- Gate ---------------- */
+function gateTokenValid(){
+  try {
+    var t = sessionStorage.getItem(GATE_KEY);
+    if (!t) return false;
+    var body = t.split(".")[0].replace(/-/g, "+").replace(/_/g, "/");
+    var payload = JSON.parse(atob(body));
+    return payload && typeof payload.exp === "number" && Date.now() < payload.exp;
+  } catch (e) { return false; }
+}
+async function submitGate(e){
+  e.preventDefault();
+  var code = $("gate-code").value;
+  var btn = $("gate-btn"), err = $("gate-err");
+  err.textContent = ""; btn.disabled = true; btn.textContent = "Checking…";
+  try {
+    var r = await fetch("/api/verify-code", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ code: code })
+    });
+    var d = null; try { d = await r.json(); } catch (e2) {}
+    if (r.ok && d && d.ok && d.token) {
+      try { sessionStorage.setItem(GATE_KEY, d.token); } catch (e3) {}
+      if (d.weak_code) { try { sessionStorage.setItem("ta-weak-code", "1"); } catch (e4) {} }
+      enterShell();
+      return;
+    }
+    if (r.status === 429) err.textContent = "Too many wrong attempts. Access is locked for 15 minutes.";
+    else if (r.status === 503) err.textContent = "The access code is not configured yet. The site owner must set it in Vercel (see ADMIN-SETUP.md).";
+    else if (d && typeof d.remaining_attempts === "number") err.textContent = "Wrong code. " + d.remaining_attempts + " attempt(s) left before lockout.";
+    else err.textContent = "Wrong code. Please try again.";
+  } catch (e) {
+    err.textContent = "Could not reach the server. Check your connection and try again.";
+  } finally {
+    btn.disabled = false; btn.textContent = "Continue";
+    $("gate-code").value = ""; $("gate-code").focus();
+  }
+}
+function showGate(on){ show($("gate"), on); }
+function showShell(on){ show($("shell"), on); }
+
+/* ---------------- Sign out ---------------- */
+function signOut(expired){
+  try { sessionStorage.removeItem(GATE_KEY); sessionStorage.removeItem("ta-weak-code"); } catch (e) {}
+  cache = {};
+  showShell(false); showGate(true);
+  if (expired) $("gate-err").textContent = "Your session expired. Enter the access code again.";
+  $("gate-code").focus();
+}
+
+/* ---------------- Shell / navigation ---------------- */
+var SECTIONS = [
+  ["dashboard", "📊", "Dashboard", "Overview"],
+  ["orders", "🧾", "Orders", "Orders"],
+  ["products", "🎨", "Products", "Products"],
+  ["packs", "📦", "Ready-Made Packs", "Ready-Made Packs"],
+  ["inventory", "📦", "Inventory", "Inventory"],
+  ["customers", "👥", "Customers", "Customers"],
+  ["carts", "🛒", "Carts", "Cart Tracking"],
+  ["activity", "📈", "Activity Logs", "Website Activity"],
+  ["audit", "🛡️", "Audit Logs", "Admin Activity & Audit"],
+  ["settings", "⚙️", "Settings", "Settings"],
+  ["super", "🚨", "Super Admin", "Super Admin Controls"]
+];
+function buildNav(){
+  var html = '<div class="sect">Store</div>';
+  SECTIONS.forEach(function(s){
+    if (s[0] === "audit") html += '<div class="sect">Security</div>';
+    if (s[0] === "super") html += '<div class="sect">Danger Zone</div>';
+    html += '<button data-section="' + s[0] + '" class="' + (currentSection === s[0] ? "on" : "") + '"><span class="ic">' + s[1] + '</span>' + s[2] + '</button>';
+  });
+  $("sidenav").innerHTML = html;
+  $("sidenav").querySelectorAll("button").forEach(function(b){
+    b.addEventListener("click", function(){ goSection(b.getAttribute("data-section")); $("sidebar").classList.remove("open"); });
+  });
+}
+function goSection(name){
+  currentSection = name;
+  buildNav();
+  var sec = SECTIONS.find(function(s){ return s[0] === name; });
+  $("page-title").textContent = sec ? sec[3] : "Dashboard";
+  loadSection(name);
+}
+function enterShell(){
+  showGate(false); showShell(true);
+  if (sessionStorage.getItem("ta-weak-code") === "1") {
+    $("weak-banner").innerHTML = '<div class="notice warn"><strong>Weak access code:</strong> the current access code is short. Set a stronger ADMIN_ACCESS_CODE in Vercel project settings and redeploy before sharing this panel widely.</div>';
+  }
+  buildNav();
+  goSection("dashboard");
+  refreshNotifications();
+}
+async function probeDb(){
+  try {
+    var d = await api("probe");
+    STORAGE_BASE = (d && d.storageBase) || "";
+    dbDown = false;
+    $("db-banner").innerHTML = "";
+    return true;
+  } catch (e) {
+    dbDown = true;
+    $("db-banner").innerHTML = '<div class="notice demo"><strong>Database not connected.</strong> The Supabase tables were not found (the schema may not have been run yet, or the server settings are missing). The panel cannot show live data until the owner runs <code>backend/supabase/schema.sql</code> once in the Supabase SQL Editor and the server settings are in place — see ADMIN-SETUP.md in the project.</div>';
+    return false;
+  }
+}
+async function refreshNotifications(){
+  try {
+    if (!ensureGate()) return;
+    var d = await api("notifications");
+    var pending = d.pending || 0;
+    var low = d.low || 0;
+    var n = pending + low;
+    var bell = $("bell-n");
+    bell.style.display = n ? "" : "none";
+    bell.textContent = String(n);
+    $("notifdrop").innerHTML = "<h3>Notifications</h3>"
+      + '<div class="ni">🧾 <strong>' + pending + '</strong> order(s) waiting for confirmation.</div>'
+      + '<div class="ni">📦 <strong>' + low + '</strong> product(s) low or out of stock (5 or fewer left).</div>'
+      + '<div class="ni muted">Counts are live from the database.</div>';
+  } catch (e) { /* notifications are best-effort */ }
+}
+
+/* ---------------- Shared loaders ---------------- */
+async function loadCategories(){
+  if (cache.cats) return cache.cats;
+  var rows = await api("categories_list");
+  cache.cats = rows || [];
+  catsById = {}; catsBySlug = {};
+  cache.cats.forEach(function(c){ catsById[c.id] = c; catsBySlug[c.slug] = c; });
+  return cache.cats;
+}
+async function loadProducts(){
+  var rows = await api("products_list");
+  cache.products = rows || [];
+  return cache.products;
+}
+async function loadImages(productId){
+  var rows = await api("product_images_list", { productId: productId });
+  return rows || [];
+}
+function productImage(p){
+  if (p && p._img) return p._img;
+  return null;
+}
+function statusBadge(s){
+  var cls = { "Pending Confirmation": "pending", "Confirmed": "confirmed", "Processing": "processing", "Completed": "completed", "Cancelled": "cancelled" }[s] || "pending";
+  return '<span class="badge ' + cls + '">' + esc(s) + '</span>';
+}
+</script>
+<script>
+"use strict";
+/* ---------------- Dashboard ---------------- */
+async function renderDashboard(){
+  var el = $("content");
+  el.innerHTML = '<p class="muted">Loading live data…</p>';
+  try {
+    if (!ensureGate()) return;
+    await probeDb();
+    var thirty = new Date(Date.now() - 30 * 864e5).toISOString();
+    var bundle = await api("dashboard_data", { since: thirty });
+    var orders = bundle.orders || [], items = bundle.items || [], products = bundle.products || [],
+        events = bundle.events || [], profiles = bundle.profiles || [], recentEvents = bundle.recent || [];
+    cache.products = products;
+    var live = orders.filter(function(o){ return o.status !== "Cancelled"; });
+    var revenue = live.reduce(function(s, o){ return s + (o.total_pkr || 0); }, 0);
+    var pending = orders.filter(function(o){ return o.status === "Pending Confirmation"; }).length;
+    var completed = orders.filter(function(o){ return o.status === "Completed"; }).length;
+    var sessions = {};
+    events.forEach(function(e){ if (e.session_id) sessions[e.session_id] = 1; });
+    var visitors = Object.keys(sessions).length;
+    var newCustomers = profiles.filter(function(p){ return p.created_at >= thirty; }).length;
+    var lowStock = products.filter(function(p){ return p.is_available && (p.stock_quantity || 0) <= 5; });
+    var costById = {};
+    products.forEach(function(p){ costById[p.id] = p.cost_pkr; });
+    var profitKnown = true, profit = 0;
+    items.forEach(function(it){
+      var c = costById[it.product_id];
+      if (c == null) { profitKnown = false; return; }
+      profit += (it.unit_price_pkr - c) * it.quantity;
+    });
+    if (!items.length) profitKnown = false;
+    /* 7-day revenue */
+    var days = [];
+    for (var i = 6; i >= 0; i--) {
+      var d = new Date(Date.now() - i * 864e5);
+      var key = d.toISOString().slice(0, 10);
+      var sum = live.filter(function(o){ return String(o.created_at).slice(0, 10) === key; })
+        .reduce(function(s, o){ return s + (o.total_pkr || 0); }, 0);
+      days.push({ label: d.toLocaleDateString("en-PK", { weekday: "short" }), sum: sum });
+    }
+    var maxDay = Math.max.apply(null, days.map(function(d){ return d.sum; }).concat([1]));
+    /* Best sellers */
+    var byName = {};
+    items.forEach(function(it){
+      var b = byName[it.product_name] || (byName[it.product_name] = { qty: 0, rev: 0 });
+      b.qty += it.quantity; b.rev += it.line_total_pkr;
+    });
+    var best = Object.keys(byName).map(function(n){ return { name: n, qty: byName[n].qty, rev: byName[n].rev }; })
+      .sort(function(a, b){ return b.qty - a.qty; }).slice(0, 5);
+    var avg = live.length ? Math.round(revenue / live.length) : 0;
+
+    el.innerHTML =
+      '<div class="statgrid">'
+      + statCard("Total revenue", pkr(revenue), live.length + " non-cancelled order(s)")
+      + statCard("Orders", String(orders.length), pending + " pending · " + completed + " completed")
+      + statCard("Visitors (30 days)", String(visitors), events.length + " recorded events")
+      + statCard("Registered customers", String(profiles.length), newCustomers + " new in 30 days")
+      + statCard("Average order value", pkr(avg), "Non-cancelled orders")
+      + statCard("Estimated profit", profitKnown ? pkr(profit) : "Not set", profitKnown ? "From actual product costs" : "Set a cost on every sold product to see profit")
+      + '</div>'
+      + '<div class="grid2"><div class="panel"><h2>Revenue — last 7 days</h2><div class="chartbars">'
+      + days.map(function(d){ return '<div class="bar"><span style="font-size:.75rem;font-weight:700">' + (d.sum ? pkr(d.sum) : "") + '</span><div class="fill" style="height:' + Math.max(4, Math.round(d.sum / maxDay * 100)) + 'px"></div><span class="dl">' + d.label + '</span></div>'; }).join("")
+      + '</div></div>'
+      + '<div class="panel"><h2>Best sellers</h2>'
+      + (best.length ? '<table><thead><tr><th>Product</th><th>Sold</th><th>Revenue</th></tr></thead><tbody>'
+        + best.map(function(b){ return "<tr><td>" + esc(b.name) + "</td><td>" + b.qty + "</td><td>" + pkr(b.rev) + "</td></tr>"; }).join("") + "</tbody></table>"
+        : emptyState("🏆", "No sales yet", "Best sellers appear here once orders are recorded."))
+      + '</div></div>'
+      + '<div class="grid2"><div class="panel"><h2>Recent orders</h2>'
+      + (orders.length ? '<table><thead><tr><th>Order</th><th>Customer</th><th>Total</th><th>Status</th></tr></thead><tbody>'
+        + orders.slice(0, 5).map(function(o){ return "<tr><td><a href=\"#\" data-order=\"" + o.id + "\" style=\"text-decoration:underline;font-weight:700\">" + esc(o.order_code) + "</a></td><td>" + esc(o.customer_name) + "</td><td>" + pkr(o.total_pkr) + "</td><td>" + statusBadge(o.status) + "</td></tr>"; }).join("") + "</tbody></table>"
+        : emptyState("🧾", "No orders yet", "Orders placed on the website will appear here."))
+      + '</div><div class="panel"><h2>Stock alerts</h2>'
+      + (lowStock.length ? '<table><thead><tr><th>Product</th><th>Left</th></tr></thead><tbody>'
+        + lowStock.map(function(p){ return "<tr><td>" + esc(p.name) + "</td><td><span class=\"badge " + ((p.stock_quantity || 0) === 0 ? "low" : "pending") + "\">" + (p.stock_quantity || 0) + " left</span></td></tr>"; }).join("") + "</tbody></table>"
+        : '<p class="muted">No low-stock products. Stock counts are set in Inventory.</p>')
+      + '<h3 style="margin-top:18px">Recent activity</h3>'
+      + (recentEvents.length ? "<ul style=\"margin-left:18px\">" + recentEvents.map(function(e){ return "<li>" + esc(e.event_type) + (e.detail ? " — " + esc(e.detail) : "") + " <span class=\"muted\">(" + fmtDate(e.created_at) + ")</span></li>"; }).join("") + "</ul>"
+        : '<p class="muted">No website activity recorded yet.</p>')
+      + '</div></div>';
+    el.querySelectorAll("[data-order]").forEach(function(a){
+      a.addEventListener("click", function(e){ e.preventDefault(); goSection("orders"); setTimeout(function(){ openOrder(a.getAttribute("data-order")); }, 150); });
+    });
+  } catch (e) {
+    el.innerHTML = errState(dbDown ? "The database tables were not found. Run the schema first (see ADMIN-SETUP.md)." : e.message);
+  }
+}
+function statCard(lbl, val, sub){
+  return '<div class="stat"><div class="lbl">' + esc(lbl) + '</div><div class="val">' + esc(val) + '</div><div class="sub2">' + esc(sub) + '</div></div>';
+}
+
+/* ---------------- Orders ---------------- */
+var orderFilter = { status: "", q: "" };
+async function renderOrders(){
+  var el = $("content");
+  el.innerHTML = '<p class="muted">Loading orders…</p>';
+  try {
+    if (!ensureGate()) return;
+    var orders = await api("orders_list", { status: orderFilter.status || undefined }) || [];
+    if (orderFilter.q) {
+      var needle = orderFilter.q.toLowerCase();
+      orders = orders.filter(function(o){
+        return String(o.order_code + " " + o.customer_name + " " + o.customer_phone + " " + o.city).toLowerCase().includes(needle);
+      });
+    }
+    cache.orders = orders;
+    var statuses = ["Pending Confirmation", "Confirmed", "Processing", "Completed", "Cancelled"];
+    el.innerHTML = '<div class="toolbar">'
+      + '<select id="of-status"><option value="">All statuses</option>' + statuses.map(function(s){ return '<option ' + (orderFilter.status === s ? "selected" : "") + '>' + s + '</option>'; }).join("") + '</select>'
+      + '<input id="of-q" type="search" placeholder="Search code, name, phone, city…" value="' + esc(orderFilter.q) + '">'
+      + '<span class="spacer"></span><button class="pillbtn" id="of-export">Export CSV</button></div>'
+      + (orders.length ? '<div class="panel" style="padding:6px 16px"><table><thead><tr><th>Order</th><th>Customer</th><th>Phone</th><th>Total</th><th>Status</th><th>Date</th><th></th></tr></thead><tbody>'
+        + orders.map(function(o){ return "<tr><td><strong>" + esc(o.order_code) + "</strong></td><td>" + esc(o.customer_name) + "<br><span class=\"muted\">" + esc(o.city) + "</span></td><td>" + esc(o.customer_phone) + "</td><td>" + pkr(o.total_pkr) + "<br><span class=\"muted\" style=\"font-size:.8rem\">Delivery: " + esc(o.delivery_label) + "</span></td><td>" + statusBadge(o.status) + "</td><td>" + fmtDate(o.created_at) + "</td><td><button class=\"pillbtn\" data-view=\"" + o.id + "\">View</button></td></tr>"; }).join("")
+        + "</tbody></table></div>"
+        : emptyState("🧾", "No orders found", orderFilter.status || orderFilter.q ? "Try a different filter." : "Orders placed on the website will appear here."));
+    $("of-status").addEventListener("change", function(){ orderFilter.status = this.value; renderOrders(); });
+    $("of-q").addEventListener("input", function(){ orderFilter.q = this.value; clearTimeout(this._t); var self = this; this._t = setTimeout(renderOrders, 350); });
+    $("of-export").addEventListener("click", function(){
+      csvDownload("tiny-artist-orders.csv", [["Order","Customer","Phone","City","Address","Subtotal","Delivery","Total","Status","Date","Notes"]].concat(orders.map(function(o){
+        return [o.order_code, o.customer_name, o.customer_phone, o.city, o.delivery_address, o.subtotal_pkr, o.delivery_label, o.total_pkr, o.status, o.created_at, o.admin_notes || ""];
+      })));
+    });
+    el.querySelectorAll("[data-view]").forEach(function(b){ b.addEventListener("click", function(){ openOrder(b.getAttribute("data-view")); }); });
+  } catch (e) {
+    el.innerHTML = errState(e.message);
+  }
+}
+async function openOrder(id){
+  try {
+    var det = await api("order_detail", { id: id });
+    var o = det.order, items = det.items || [];
+    var waPhone = String(o.customer_phone || "").replace(/[^0-9]/g, "").replace(/^0/, "92");
+    var mapUrl = (o.delivery_lat != null && o.delivery_lng != null)
+      ? "https://www.google.com/maps?q=" + o.delivery_lat + "," + o.delivery_lng
+      : "https://www.google.com/maps/search/" + encodeURIComponent(o.delivery_address + ", " + o.city);
+    var statuses = ["Pending Confirmation", "Confirmed", "Processing", "Completed", "Cancelled"];
+    openModal('<h2>Order ' + esc(o.order_code) + '</h2>'
+      + '<dl class="kv"><dt>Customer</dt><dd><strong>' + esc(o.customer_name) + '</strong></dd>'
+      + '<dt>Phone</dt><dd>' + esc(o.customer_phone) + ' <a class="pillbtn" href="https://wa.me/' + esc(waPhone) + '" target="_blank" rel="noopener">WhatsApp</a></dd>'
+      + '<dt>Address</dt><dd>' + esc(o.delivery_address) + ', ' + esc(o.city) + ' <a class="pillbtn" href="' + esc(mapUrl) + '" target="_blank" rel="noopener">Map</a></dd>'
+      + '<dt>Placed</dt><dd>' + fmtDate(o.created_at) + '</dd>'
+      + '<dt>Instructions</dt><dd>' + esc(o.instructions || "None") + '</dd></dl>'
+      + '<table style="margin-top:16px"><thead><tr><th>Item</th><th>Qty</th><th>Unit</th><th>Total</th></tr></thead><tbody>'
+      + items.map(function(it){ return "<tr><td>" + esc(it.product_name) + (it.custom_pack ? "<br><span class=\"muted\" style=\"font-size:.82rem\">Custom pack</span>" : "") + "</td><td>" + it.quantity + "</td><td>" + pkr(it.unit_price_pkr) + "</td><td>" + pkr(it.line_total_pkr) + "</td></tr>"; }).join("")
+      + '</tbody></table><p style="text-align:right;margin-top:10px"><strong>Subtotal:</strong> ' + pkr(o.subtotal_pkr) + ' · <strong>Delivery:</strong> ' + esc(o.delivery_label) + ' · <strong>Total:</strong> ' + pkr(o.total_pkr) + '</p>'
+      + '<div class="field" style="margin-top:16px"><label for="ord-status">Order status</label><select id="ord-status">'
+      + statuses.map(function(s){ return '<option ' + (o.status === s ? "selected" : "") + '>' + s + '</option>'; }).join("") + '</select></div>'
+      + '<div class="field"><label for="ord-notes">Admin notes (only admins see these)</label><textarea id="ord-notes" rows="2">' + esc(o.admin_notes || "") + '</textarea></div>'
+      + '<div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn small" id="ord-save">Save changes</button><button class="pillbtn" id="ord-print">Print</button><button class="pillbtn" id="ord-close">Close</button></div>');
+    $("ord-close").addEventListener("click", closeModal);
+    $("ord-print").addEventListener("click", function(){
+      var w = window.open("", "_blank");
+      if (!w) { toast("Allow pop-ups to print."); return; }
+      w.document.write("<html><head><title>Order " + esc(o.order_code) + "</title></head><body style=\"font-family:sans-serif\">"
+        + "<h1>Tiny Artist — Order " + esc(o.order_code) + "</h1><p>" + esc(o.customer_name) + " · " + esc(o.customer_phone) + "<br>" + esc(o.delivery_address) + ", " + esc(o.city) + "</p>"
+        + "<ul>" + items.map(function(it){ return "<li>" + esc(it.product_name) + " × " + it.quantity + " — " + pkr(it.line_total_pkr) + "</li>"; }).join("") + "</ul>"
+        + "<p><strong>Total: " + pkr(o.total_pkr) + "</strong> · Delivery: " + esc(o.delivery_label) + " · Status: " + esc(o.status) + "</p></body></html>");
+      w.document.close(); w.focus(); w.print();
+    });
+    $("ord-save").addEventListener("click", async function(){
+      var ns = $("ord-status").value, nn = $("ord-notes").value;
+      try {
+        await api("order_update", { id: id, status: ns, admin_notes: nn });
+        toast("Order updated.");
+        closeModal(); renderOrders(); refreshNotifications();
+      } catch (e) { toast("Could not save: " + e.message); }
+    });
+  } catch (e) { toast("Could not load order: " + e.message); }
+}
+
+/* ---------------- Products & Packs ---------------- */
+var prodFilter = { q: "", cat: "", kitsOnly: false };
+async function renderProducts(kitsOnly){
+  prodFilter.kitsOnly = !!kitsOnly;
+  var el = $("content");
+  el.innerHTML = '<p class="muted">Loading products…</p>';
+  try {
+    if (!ensureGate()) return;
+    await loadCategories();
+    var products = await loadProducts();
+    var images = await api("product_images_all") || [];
+    var firstImg = {};
+    images.forEach(function(im){ if (!firstImg[im.product_id]) firstImg[im.product_id] = im.storage_path; });
+    cache.firstImg = firstImg;
+    var list = products.filter(function(p){ return kitsOnly ? p.is_kit : true; });
+    if (prodFilter.cat) list = list.filter(function(p){ return p.category_id === prodFilter.cat; });
+    if (prodFilter.q) { var n = prodFilter.q.toLowerCase(); list = list.filter(function(p){ return (p.name + " " + p.slug + " " + (p.sku || "")).toLowerCase().includes(n); }); }
+    var title = kitsOnly ? "Ready-made packs" : "Products";
+    el.innerHTML = '<div class="toolbar">'
+      + '<input id="pf-q" type="search" placeholder="Search products…" value="' + esc(prodFilter.q) + '">'
+      + '<select id="pf-cat"><option value="">All categories</option>' + cache.cats.map(function(c){ return '<option value="' + c.id + '" ' + (prodFilter.cat === c.id ? "selected" : "") + '>' + esc(c.name) + '</option>'; }).join("") + '</select>'
+      + '<span class="spacer"></span><button class="btn small" id="pf-add">+ Add ' + (kitsOnly ? "pack" : "product") + '</button></div>'
+      + (kitsOnly ? '<div class="notice info">Official ready-made packs: <strong>15 Big Pieces — Rs. 899</strong> (6 Colors + 2 Brushes), <strong>20 Big Pieces — Rs. 1,199</strong> (12 Colors + 3 Brushes), <strong>30 Big Pieces — Rs. 1,499</strong> (18 Colors + 5 Brushes). All three include FREE HOME DELIVERY. The poster kits (20 Pcs Rs. 1,000 / 30 Pcs Rs. 1,300) are separate products and are not changed here.</div>' : "")
+      + (list.length ? '<div class="panel" style="padding:6px 16px"><table><thead><tr><th></th><th>Product</th><th>Category</th><th>Price</th><th>Stock</th><th>Status</th><th></th></tr></thead><tbody>'
+        + list.map(function(p){
+          var img = (firstImg[p.id] && STORAGE_BASE) ? STORAGE_BASE + "/storage/v1/object/public/product-images/" + firstImg[p.id] : null;
+          var thumb = img ? '<img class="thumb" src="' + esc(img) + '" alt="">' : '<span class="thumb glyph">🎨</span>';
+          return "<tr><td>" + thumb + "</td><td><strong>" + esc(p.name) + "</strong><br><span class=\"muted\" style=\"font-size:.82rem\">" + esc(p.slug) + (p.sku ? " · " + esc(p.sku) : "") + (p.is_featured ? " · ⭐ Featured" : "") + "</span></td><td>" + esc(catsById[p.category_id] ? catsById[p.category_id].name : "—") + "</td><td>" + (p.price_pkr == null ? '<span class="badge pending">Price Coming Soon</span>' : "<strong>" + pkr(p.price_pkr) + "</strong>") + "</td><td>" + (p.stock_quantity || 0) + "</td><td>" + (p.is_available ? '<span class="badge ok">Available</span>' : '<span class="badge cancelled">Disabled</span>') + "</td><td style=\"white-space:nowrap\"><button class=\"pillbtn\" data-edit=\"" + p.id + "\">Edit</button> <button class=\"pillbtn\" data-toggle=\"" + p.id + "\">" + (p.is_available ? "Disable" : "Enable") + "</button></td></tr>";
+        }).join("") + "</tbody></table></div>"
+        : emptyState("🎨", "No products found", "Add your first product with the button above."));
+    $("pf-q").addEventListener("input", function(){ prodFilter.q = this.value; clearTimeout(this._t); this._t = setTimeout(function(){ renderProducts(kitsOnly); }, 350); });
+    $("pf-cat").addEventListener("change", function(){ prodFilter.cat = this.value; renderProducts(kitsOnly); });
+    $("pf-add").addEventListener("click", function(){ productForm(null, kitsOnly); });
+    el.querySelectorAll("[data-edit]").forEach(function(b){ b.addEventListener("click", function(){ productForm(b.getAttribute("data-edit"), kitsOnly); }); });
+    el.querySelectorAll("[data-toggle]").forEach(function(b){ b.addEventListener("click", function(){ toggleProduct(b.getAttribute("data-toggle")); }); });
+  } catch (e) {
+    el.innerHTML = errState(e.message);
+  }
+}
+async function toggleProduct(id){
+  var p = (cache.products || []).find(function(x){ return x.id === id; });
+  if (!p) return;
+  try {
+    await api("product_toggle", { id: id, is_available: !p.is_available });
+    toast(p.is_available ? "Product disabled." : "Product enabled.");
+    renderProducts(prodFilter.kitsOnly);
+  } catch (e) { toast("Could not update: " + e.message); }
+}
+function slugify(s){ return String(s || "").toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, ""); }
+async function productForm(id, kitsOnly){
+  var p = id ? (cache.products || []).find(function(x){ return x.id === id; }) : null;
+  var imgs = p ? await loadImages(p.id) : [];
+  var contents = Array.isArray(p && p.contents) ? p.contents.join("\n") : "";
+  openModal('<h2>' + (p ? "Edit product" : "Add " + (kitsOnly ? "pack" : "product")) + '</h2>'
+    + '<form id="pform">'
+    + '<div class="field"><label for="pf-name">Name</label><input id="pf-name" required value="' + esc(p ? p.name : "") + '"></div>'
+    + '<div class="field"><label for="pf-slug">Slug (web address name)</label><input id="pf-slug" required value="' + esc(p ? p.slug : "") + '"><div class="hint">Lowercase letters, numbers and dashes. Used in the product link.</div></div>'
+    + '<div class="field"><label for="pf-desc">Description</label><textarea id="pf-desc" rows="2">' + esc(p ? p.description : "") + '</textarea></div>'
+    + '<div class="field"><label for="pf-cat2">Category</label><select id="pf-cat2"><option value="">No category</option>' + cache.cats.map(function(c){ return '<option value="' + c.id + '" ' + (p && p.category_id === c.id ? "selected" : "") + '>' + esc(c.name) + '</option>'; }).join("") + '</select></div>'
+    + '<div class="field"><label for="pf-price">Price (Rs.) — leave empty for “Price Coming Soon”</label><input id="pf-price" type="number" min="0" step="1" value="' + (p && p.price_pkr != null ? p.price_pkr : "") + '"></div>'
+    + '<div class="field"><label for="pf-cost">Cost per item (Rs.) — leave empty if unknown; profit is never guessed</label><input id="pf-cost" type="number" min="0" step="1" value="' + (p && p.cost_pkr != null ? p.cost_pkr : "") + '"></div>'
+    + '<div class="field"><label for="pf-sku">SKU</label><input id="pf-sku" value="' + esc(p ? (p.sku || "") : "") + '"></div>'
+    + '<div class="field"><label for="pf-stock">Stock quantity</label><input id="pf-stock" type="number" min="0" step="1" value="' + (p ? (p.stock_quantity || 0) : 0) + '"></div>'
+    + '<div class="field"><label for="pf-contents">Included contents (one per line, for kits and packs)</label><textarea id="pf-contents" rows="3">' + esc(contents) + '</textarea></div>'
+    + '<div class="field"><label><input type="checkbox" id="pf-avail" ' + (!p || p.is_available ? "checked" : "") + '> Available for sale</label> &nbsp; <label><input type="checkbox" id="pf-feat" ' + (p && p.is_featured ? "checked" : "") + '> Featured</label> &nbsp; <label><input type="checkbox" id="pf-kit" ' + ((p && p.is_kit) || (!p && kitsOnly) ? "checked" : "") + '> This is a kit / pack</label></div>'
+    + '<div class="field"><label>Product images</label><div class="dropzone" id="pf-drop">Drop an image here, paste one (Ctrl+V), or tap to choose<input type="file" id="pf-file" accept="image/jpeg,image/png,image/webp,image/gif" hidden></div><div class="hint">JPG, PNG, WebP or GIF, up to 2 MB. Images are stored in Supabase Storage.</div>'
+    + '<div id="pf-imgs" style="margin-top:10px">' + imgs.map(function(im){ return '<span style="display:inline-block;margin:0 8px 8px 0;text-align:center"><img class="thumb" style="width:72px;height:72px" src="' + esc(STORAGE_BASE + "/storage/v1/object/public/product-images/" + im.storage_path) + '" alt=""><br><button type="button" class="pillbtn" data-delimg="' + im.id + '">Remove</button></span>'; }).join("") + '</div></div>'
+    + '<p class="err" id="pf-err"></p>'
+    + '<div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn small" type="submit">' + (p ? "Save changes" : "Add product") + '</button>'
+    + (p ? '<button class="btn small danger" type="button" id="pf-del">Delete product</button>' : '')
+    + '<button class="pillbtn" type="button" id="pf-cancel">Cancel</button></div></form>');
+  var pendingFile = null;
+  var drop = $("pf-drop"), fileInput = $("pf-file");
+  drop.addEventListener("click", function(){ fileInput.click(); });
+  drop.addEventListener("dragover", function(e){ e.preventDefault(); drop.classList.add("over"); });
+  drop.addEventListener("dragleave", function(){ drop.classList.remove("over"); });
+  drop.addEventListener("drop", function(e){ e.preventDefault(); drop.classList.remove("over"); if (e.dataTransfer.files.length) setFile(e.dataTransfer.files[0]); });
+  fileInput.addEventListener("change", function(){ if (fileInput.files.length) setFile(fileInput.files[0]); });
+  document.addEventListener("paste", pasteHandler);
+  function pasteHandler(e){
+    if (!$("pf-drop")) { document.removeEventListener("paste", pasteHandler); return; }
+    var items = (e.clipboardData && e.clipboardData.items) || [];
+    for (var i = 0; i < items.length; i++) if (items[i].type.indexOf("image/") === 0) { setFile(items[i].getAsFile()); e.preventDefault(); break; }
+  }
+  function setFile(f){
+    var okTypes = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+    if (okTypes.indexOf(f.type) === -1) { $("pf-err").textContent = "That image format is not supported. Use JPG, PNG, WebP or GIF."; return; }
+    if (f.size > 2 * 1024 * 1024) { $("pf-err").textContent = "That image is larger than 2 MB."; return; }
+    pendingFile = f; $("pf-err").textContent = "";
+    var url = URL.createObjectURL(f);
+    drop.innerHTML = 'New image ready to upload:<br><img src="' + url + '" alt="">';
+  }
+  $("pf-imgs").querySelectorAll("[data-delimg]").forEach(function(b){
+    b.addEventListener("click", async function(){
+      var imgId = b.getAttribute("data-delimg");
+      try {
+        await api("product_image_delete", { imageId: imgId });
+        toast("Image removed."); closeModal(); renderProducts(prodFilter.kitsOnly);
+      } catch (e) { toast("Could not remove image: " + e.message); }
+    });
+  });
+  $("pf-cancel").addEventListener("click", function(){ document.removeEventListener("paste", pasteHandler); closeModal(); });
+  if ($("pf-del")) $("pf-del").addEventListener("click", async function(){
+    if (!confirm("Delete “" + p.name + "” permanently? Orders already placed keep their own records. This cannot be undone.")) return;
+    try {
+      await api("product_delete", { id: p.id });
+      document.removeEventListener("paste", pasteHandler);
+      toast("Product deleted."); closeModal(); renderProducts(prodFilter.kitsOnly);
+    } catch (e) { toast("Could not delete: " + e.message); }
+  });
+  $("pf-name").addEventListener("input", function(){ if (!p) $("pf-slug").value = slugify(this.value); });
+  $("pform").addEventListener("submit", async function(e){
+    e.preventDefault();
+    var err = $("pf-err"); err.textContent = "";
+    var slug = slugify($("pf-slug").value);
+    if (!slug) { err.textContent = "Enter a valid slug."; return; }
+    var priceVal = $("pf-price").value.trim(), costVal = $("pf-cost").value.trim();
+    var body = {
+      name: $("pf-name").value.trim(),
+      slug: slug,
+      description: $("pf-desc").value.trim(),
+      category_id: $("pf-cat2").value || null,
+      price_pkr: priceVal === "" ? null : Math.max(0, parseInt(priceVal, 10)),
+      cost_pkr: costVal === "" ? null : Math.max(0, parseInt(costVal, 10)),
+      sku: $("pf-sku").value.trim() || null,
+      stock_quantity: Math.max(0, parseInt($("pf-stock").value, 10) || 0),
+      contents: $("pf-contents").value.split("\n").map(function(s){ return s.trim(); }).filter(Boolean),
+      is_available: $("pf-avail").checked,
+      is_featured: $("pf-feat").checked,
+      is_kit: $("pf-kit").checked,
+      updated_at: new Date().toISOString()
+    };
+    try {
+      var saved = await api("product_save", Object.assign({ id: p ? p.id : undefined }, body));
+      var row = saved && saved.id ? saved : null;
+      if (pendingFile && row) {
+        var dataUrl = await new Promise(function(resolve, reject){
+          var fr = new FileReader();
+          fr.onload = function(){ resolve(fr.result); };
+          fr.onerror = function(){ reject(new Error("Could not read the image file.")); };
+          fr.readAsDataURL(pendingFile);
+        });
+        var b64 = String(dataUrl).split(",")[1] || "";
+        await api("product_image_upload", {
+          productId: row.id, contentType: pendingFile.type,
+          dataBase64: b64, altText: body.name
+        });
+      }
+      document.removeEventListener("paste", pasteHandler);
+      toast(p ? "Product saved." : "Product added.");
+      closeModal(); renderProducts(prodFilter.kitsOnly); refreshNotifications();
+    } catch (e2) { err.textContent = e2.message; }
+  });
+}
+
+/* ---------------- Inventory ---------------- */
+async function renderInventory(){
+  var el = $("content");
+  el.innerHTML = '<p class="muted">Loading inventory…</p>';
+  try {
+    if (!ensureGate()) return;
+    var bundle = await api("inventory_data");
+    var products = bundle.products || [];
+    var items = bundle.items || [];
+    var sold = {};
+    items.forEach(function(it){ sold[it.product_id] = (sold[it.product_id] || 0) + it.quantity; });
+    var hist = bundle.history || [];
+    el.innerHTML = '<div class="panel" style="padding:6px 16px"><table><thead><tr><th>Product</th><th>In stock</th><th>Sold</th><th>Status</th><th>Adjust stock</th></tr></thead><tbody>'
+      + products.map(function(p){
+        var stock = p.stock_quantity || 0;
+        var badge = !p.is_available ? '<span class="badge cancelled">Disabled</span>'
+          : stock === 0 ? '<span class="badge low">Out of stock</span>'
+          : stock <= 5 ? '<span class="badge pending">Low stock</span>'
+          : '<span class="badge ok">In stock</span>';
+        return "<tr><td><strong>" + esc(p.name) + "</strong></td><td><strong>" + stock + "</strong></td><td>" + (sold[p.id] || 0) + "</td><td>" + badge + "</td><td style=\"white-space:nowrap\">"
+          + '<button class="pillbtn" data-adj="' + p.id + ':-10">−10</button> <button class="pillbtn" data-adj="' + p.id + ':-1">−1</button> <button class="pillbtn" data-adj="' + p.id + ':1">+1</button> <button class="pillbtn" data-adj="' + p.id + ':10">+10</button></td></tr>';
+      }).join("") + "</tbody></table></div>"
+      + '<div class="panel"><h2>Stock movement history</h2>'
+      + (hist.length ? '<table><thead><tr><th>When</th><th>Product</th><th>Change</th></tr></thead><tbody>'
+        + hist.map(function(h){
+          var b = (h.before_value && h.before_value.stock_quantity), a = (h.after_value && h.after_value.stock_quantity);
+          return "<tr><td>" + fmtDate(h.created_at) + "</td><td>" + esc(h.target_id) + "</td><td>" + esc(b) + " → " + esc(a) + "</td></tr>";
+        }).join("") + "</tbody></table>"
+        : '<p class="muted">No stock changes recorded yet. Every adjustment is recorded here.</p>')
+      + '</div>';
+    el.querySelectorAll("[data-adj]").forEach(function(b){
+      b.addEventListener("click", async function(){
+        var parts = b.getAttribute("data-adj").split(":");
+        var p = products.find(function(x){ return x.id === parts[0]; });
+        var delta = parseInt(parts[1], 10);
+        var next = Math.max(0, (p.stock_quantity || 0) + delta);
+        try {
+          await api("stock_adjust", { id: p.id, stock_quantity: next });
+          toast(p.name + ": stock now " + next + ".");
+          renderInventory(); refreshNotifications();
+        } catch (e) { toast("Could not update stock: " + e.message); }
+      });
+    });
+  } catch (e) {
+    el.innerHTML = errState(e.message);
+  }
+}
+</script>
+<script>
+"use strict";
+/* ---------------- Customers ---------------- */
+async function renderCustomers(){
+  var el = $("content");
+  el.innerHTML = '<p class="muted">Loading customers…</p>';
+  try {
+    if (!ensureGate()) return;
+    var bundle = await api("customers_data");
+    var profiles = bundle.profiles || [];
+    var orders = bundle.orders || [];
+    var byUser = {};
+    orders.forEach(function(o){ if (o.user_id) (byUser[o.user_id] = byUser[o.user_id] || []).push(o); });
+    var guests = {};
+    orders.forEach(function(o){
+      if (o.user_id) return;
+      var g = guests[o.customer_phone] || (guests[o.customer_phone] = { name: o.customer_name, phone: o.customer_phone, city: o.city, orders: [] });
+      g.orders.push(o); g.name = o.customer_name; g.city = o.city;
+    });
+    cache.customerOrders = orders;
+    el.innerHTML = '<div class="panel"><h2>Registered customers</h2>'
+      + (profiles.length ? '<table><thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>City</th><th>Orders</th><th>Spent</th><th>Joined</th><th></th></tr></thead><tbody>'
+        + profiles.map(function(pr){
+          var os = byUser[pr.id] || [];
+          var spent = os.filter(function(o){ return o.status !== "Cancelled"; }).reduce(function(s, o){ return s + o.total_pkr; }, 0);
+          return "<tr><td><strong>" + esc(pr.full_name || "—") + "</strong>" + (os.length > 1 ? ' <span class="badge confirmed">Returning</span>' : os.length === 1 ? ' <span class="badge pending">First-time</span>' : "") + "</td><td>" + esc(pr.email) + "</td><td>" + esc(pr.phone || "—") + "</td><td>" + esc(pr.city || "—") + "</td><td>" + os.length + "</td><td>" + pkr(spent) + "</td><td>" + fmtDate(pr.created_at) + "</td><td><button class=\"pillbtn\" data-cust=\"" + pr.id + "\">Profile</button></td></tr>";
+        }).join("") + "</tbody></table>"
+        : emptyState("👥", "No registered customers yet", "Customer accounts appear here once shoppers register on the website. Guest (WhatsApp) orders are listed below."))
+      + '</div><div class="panel"><h2>Guest customers (from orders)</h2><p class="muted" style="margin-bottom:10px">Shoppers who ordered without an account, grouped by phone number.</p>'
+      + (Object.keys(guests).length ? '<table><thead><tr><th>Name</th><th>Phone</th><th>City</th><th>Orders</th><th>Spent</th><th>Last order</th></tr></thead><tbody>'
+        + Object.keys(guests).map(function(ph){
+          var g = guests[ph];
+          var spent = g.orders.filter(function(o){ return o.status !== "Cancelled"; }).reduce(function(s, o){ return s + o.total_pkr; }, 0);
+          return "<tr><td><strong>" + esc(g.name) + "</strong>" + (g.orders.length > 1 ? ' <span class="badge confirmed">Returning</span>' : ' <span class="badge pending">First-time</span>') + "</td><td>" + esc(g.phone) + "</td><td>" + esc(g.city) + "</td><td>" + g.orders.length + "</td><td>" + pkr(spent) + "</td><td>" + fmtDate(g.orders[0].created_at) + "</td></tr>";
+        }).join("") + "</tbody></table>"
+        : '<p class="muted">No guest orders yet.</p>')
+      + '</div>';
+    el.querySelectorAll("[data-cust]").forEach(function(b){
+      b.addEventListener("click", function(){
+        var pr = profiles.find(function(x){ return x.id === b.getAttribute("data-cust"); });
+        var os = byUser[pr.id] || [];
+        var mapUrl = pr.address ? "https://www.google.com/maps/search/" + encodeURIComponent(pr.address + ", " + (pr.city || "")) : null;
+        openModal('<h2>' + esc(pr.full_name || pr.email) + '</h2>'
+          + '<dl class="kv"><dt>Email</dt><dd>' + esc(pr.email) + '</dd><dt>Phone</dt><dd>' + esc(pr.phone || "—") + '</dd>'
+          + '<dt>City</dt><dd>' + esc(pr.city || "—") + '</dd><dt>Address</dt><dd>' + esc(pr.address || "—") + (mapUrl ? ' <a class="pillbtn" href="' + esc(mapUrl) + '" target="_blank" rel="noopener">Map</a>' : "") + '</dd>'
+          + '<dt>Joined</dt><dd>' + fmtDate(pr.created_at) + '</dd></dl>'
+          + '<h3 style="margin-top:16px">Order history</h3>'
+          + (os.length ? '<table><thead><tr><th>Order</th><th>Total</th><th>Status</th><th>Date</th></tr></thead><tbody>'
+            + os.map(function(o){ return "<tr><td>" + esc(o.order_code) + "</td><td>" + pkr(o.total_pkr) + "</td><td>" + statusBadge(o.status) + "</td><td>" + fmtDate(o.created_at) + "</td></tr>"; }).join("") + "</tbody></table>"
+            : '<p class="muted">No orders yet.</p>')
+          + '<div style="margin-top:16px"><button class="pillbtn" onclick="closeModal()">Close</button></div>');
+      });
+    });
+  } catch (e) {
+    el.innerHTML = errState(e.message);
+  }
+}
+
+/* ---------------- Carts ---------------- */
+async function renderCarts(){
+  var el = $("content");
+  el.innerHTML = '<p class="muted">Loading carts…</p>';
+  try {
+    if (!ensureGate()) return;
+    var bundle = await api("carts_data");
+    var carts = bundle.carts || [];
+    var items = bundle.items || [];
+    var products = await loadProducts();
+    var byId = {};
+    products.forEach(function(p){ byId[p.id] = p; });
+    var byCart = {};
+    items.forEach(function(it){ (byCart[it.cart_id] = byCart[it.cart_id] || []).push(it); });
+    var dayAgo = Date.now() - 864e5;
+    el.innerHTML = '<div class="notice info">Carts are recorded when shoppers are signed in or when a cart syncs from the storefront. Abandoned = no update in the last 24 hours. Values use current product prices.</div>'
+      + (carts.length ? '<div class="panel" style="padding:6px 16px"><table><thead><tr><th>Owner</th><th>Items</th><th>Value</th><th>Updated</th><th>Status</th></tr></thead><tbody>'
+        + carts.map(function(c){
+          var cis = byCart[c.id] || [];
+          var value = cis.reduce(function(s, it){ var pr = byId[it.product_id]; return s + (pr && pr.price_pkr != null ? pr.price_pkr * it.quantity : 0); }, 0);
+          var abandoned = new Date(c.updated_at).getTime() < dayAgo;
+          var owner = c.user_id ? "Customer " + esc(String(c.user_id).slice(0, 8)) + "…" : "Guest session " + esc(String(c.session_id || "").slice(0, 12)) + "…";
+          return "<tr><td>" + owner + "</td><td>" + (cis.length ? cis.map(function(it){ return esc(it.products ? it.products.name : "Product") + " × " + it.quantity; }).join("<br>") : "<span class=\"muted\">Empty</span>") + "</td><td>" + pkr(value) + "</td><td>" + fmtDate(c.updated_at) + "</td><td>" + (abandoned ? '<span class="badge pending">Abandoned</span>' : '<span class="badge ok">Active</span>') + "</td></tr>";
+        }).join("") + "</tbody></table></div>"
+        : emptyState("🛒", "No carts recorded yet", "Carts appear here once the storefront syncs them. Shoppers currently check out through WhatsApp."));
+  } catch (e) {
+    el.innerHTML = errState(e.message);
+  }
+}
+
+/* ---------------- Activity ---------------- */
+function guessDevice(ua){
+  ua = ua || "";
+  var browser = /Edg\//.test(ua) ? "Edge" : /Chrome\//.test(ua) ? "Chrome" : /Safari\//.test(ua) ? "Safari" : /Firefox\//.test(ua) ? "Firefox" : "Unknown";
+  var os = /Android/.test(ua) ? "Android" : /iPhone|iPad/.test(ua) ? "iOS" : /Windows/.test(ua) ? "Windows" : /Mac OS/.test(ua) ? "macOS" : /Linux/.test(ua) ? "Linux" : "Unknown";
+  return browser + " · " + os;
+}
+async function renderActivity(){
+  var el = $("content");
+  el.innerHTML = '<p class="muted">Loading activity…</p>';
+  try {
+    if (!ensureGate()) return;
+    var type = ($("act-type") && $("act-type").value) || "";
+    var events = await api("activity_list", { eventType: type || undefined }) || [];
+    var types = ["page_view", "product_view", "add_to_cart", "remove_from_cart", "checkout_started", "order_created", "search"];
+    cache.events = events;
+    el.innerHTML = '<div class="toolbar"><select id="act-type"><option value="">All event types</option>'
+      + types.map(function(t){ return '<option ' + (type === t ? "selected" : "") + '>' + t + '</option>'; }).join("") + '</select>'
+      + '<input id="act-q" type="search" placeholder="Search details or page…">'
+      + '<span class="spacer"></span><button class="pillbtn" id="act-export">Export CSV</button></div>'
+      + '<div class="notice info">Location is not collected: the storefront never asks for GPS and never tracks visitors secretly. Delivery addresses come only from what customers type at checkout.</div>'
+      + (events.length ? '<div class="panel" style="padding:6px 16px"><table><thead><tr><th>When</th><th>Event</th><th>Detail</th><th>Page</th><th>Device</th><th>Visitor</th></tr></thead><tbody id="act-body"></tbody></table></div>'
+        : emptyState("📈", "No activity recorded yet", "Page views, product views and cart actions appear here once the storefront sends them."));
+    var body = $("act-body");
+    function draw(filterQ){
+      var list = events;
+      if (filterQ) { var n = filterQ.toLowerCase(); list = events.filter(function(e){ return String((e.detail || "") + " " + (e.path || "")).toLowerCase().includes(n); }); }
+      body.innerHTML = list.map(function(e){
+        return "<tr><td>" + fmtDate(e.created_at) + "</td><td><strong>" + esc(e.event_type) + "</strong></td><td>" + esc(e.detail || "—") + "</td><td>" + esc(e.path || "—") + "</td><td>" + esc(guessDevice(e.user_agent)) + "</td><td>" + (e.user_id ? "Signed-in customer" : "Guest " + esc(String(e.session_id || "").slice(0, 10))) + "</td></tr>";
+      }).join("");
+    }
+    if (body) draw("");
+    $("act-type").addEventListener("change", renderActivity);
+    $("act-q").addEventListener("input", function(){ draw(this.value); });
+    $("act-export").addEventListener("click", function(){
+      csvDownload("tiny-artist-activity.csv", [["When","Event","Detail","Page","Device","Visitor"]].concat(events.map(function(e){
+        return [e.created_at, e.event_type, e.detail || "", e.path || "", guessDevice(e.user_agent), e.user_id || e.session_id || ""];
+      })));
+    });
+  } catch (e) {
+    el.innerHTML = errState(e.message);
+  }
+}
+
+/* ---------------- Audit ---------------- */
+async function renderAudit(){
+  var el = $("content");
+  el.innerHTML = '<p class="muted">Loading audit logs…</p>';
+  try {
+    if (!ensureGate()) return;
+    var bundle = await api("audit_data");
+    var logs = bundle.logs || [];
+    var attempts = bundle.attempts || [];
+    cache.audit = logs;
+    el.innerHTML = '<div class="toolbar"><input id="aud-q" type="search" placeholder="Search action, target…">'
+      + '<span class="spacer"></span><button class="pillbtn" id="aud-export">Export CSV</button></div>'
+      + (logs.length ? '<div class="panel" style="padding:6px 16px"><table><thead><tr><th>When</th><th>Action</th><th>Target</th><th>Before → After</th></tr></thead><tbody id="aud-body"></tbody></table></div>'
+        : emptyState("🛡️", "No admin activity yet", "Every order change, price change and stock change is recorded here."))
+      + '<div class="panel"><h2>Access-code attempts</h2><p class="muted" style="margin-bottom:10px">Caller IPs are stored only as hashes, never in plain text.</p>'
+        + (attempts.length ? '<table><thead><tr><th>When</th><th>Result</th><th>Caller hash</th></tr></thead><tbody>'
+          + attempts.map(function(a){ return "<tr><td>" + fmtDate(a.created_at) + "</td><td>" + (a.success ? '<span class="badge ok">Correct code</span>' : '<span class="badge low">Wrong code</span>') + "</td><td><code>" + esc(String(a.ip_hash).slice(0, 16)) + "…</code></td></tr>"; }).join("") + "</tbody></table>"
+          : '<p class="muted">No access-code attempts recorded yet.</p>') + '</div>';
+    var body = $("aud-body");
+    function draw(filterQ){
+      var list = logs;
+      if (filterQ) { var n = filterQ.toLowerCase(); list = logs.filter(function(l){ return String(l.action + " " + l.target_type + " " + l.target_id).toLowerCase().includes(n); }); }
+      body.innerHTML = list.map(function(l){
+        var change = "";
+        if (l.before_value || l.after_value) change = esc(JSON.stringify(l.before_value || {})) + " → " + esc(JSON.stringify(l.after_value || {}));
+        return "<tr><td>" + fmtDate(l.created_at) + "</td><td><strong>" + esc(l.action) + "</strong></td><td>" + esc(l.target_type) + " " + esc(l.target_id) + "</td><td style=\"max-width:320px;word-break:break-word;font-size:.85rem\">" + change + "</td></tr>";
+      }).join("");
+    }
+    if (body) draw("");
+    $("aud-q").addEventListener("input", function(){ draw(this.value); });
+    $("aud-export").addEventListener("click", function(){
+      csvDownload("tiny-artist-audit.csv", [["When","Action","Target type","Target","Before","After"]].concat(logs.map(function(l){
+        return [l.created_at, l.action, l.target_type, l.target_id, JSON.stringify(l.before_value || ""), JSON.stringify(l.after_value || "")];
+      })));
+    });
+  } catch (e) {
+    el.innerHTML = errState(e.message);
+  }
+}
+
+/* ---------------- Settings ---------------- */
+async function renderSettings(){
+  var el = $("content");
+  el.innerHTML = '<p class="muted">Loading settings…</p>';
+  try {
+    if (!ensureGate()) return;
+    var bundle = await api("settings_data");
+    var cfg = bundle.config || [];
+    var map = {};
+    cfg.forEach(function(c){ map[c.key] = c.value; });
+    var settings = bundle.settings || [];
+    var st = settings[0] || null;
+    var ref = "";
+    try { ref = new URL(STORAGE_BASE).hostname.split(".")[0]; } catch (e2) {}
+    el.innerHTML = '<div class="panel"><h2>Website settings</h2><p class="muted" style="margin-bottom:14px">These values are read by the storefront. Changes apply on the next page load.</p>'
+      + '<form id="cfg-form">'
+      + '<div class="field"><label for="cfg-wa">WhatsApp number (orders go here, digits only, with country code)</label><input id="cfg-wa" value="' + esc(map.whatsapp_number || "") + '"></div>'
+      + '<div class="field"><label for="cfg-threshold">Free delivery above (Rs.)</label><input id="cfg-threshold" type="number" min="0" value="' + esc(map.free_delivery_threshold || "2000") + '"></div>'
+      + '<div class="field"><label for="cfg-currency">Currency</label><input id="cfg-currency" value="' + esc(map.currency || "PKR") + '"></div>'
+      + '<p class="err" id="cfg-err"></p><button class="btn small" type="submit">Save settings</button></form></div>'
+      + '<div class="panel"><h2>Website status</h2>'
+      + (st ? '<p>Site is currently: ' + (st.deactivated ? '<span class="badge cancelled">DEACTIVATED (blank white page)</span>' : '<span class="badge ok">LIVE</span>') + '</p>'
+        + (st.deactivated ? '<p class="muted" style="margin-top:6px">Deactivated by ' + esc(st.deactivated_by || "admin") + ' at ' + fmtDate(st.deactivated_at) + (st.reason ? ' — reason: ' + esc(st.reason) : '') + '</p>' : '')
+        : '<p class="muted">Site status row not found.</p>')
+      + '<p style="margin-top:10px"><button class="pillbtn" onclick="goSection(\'super\')">Open Super Admin controls</button></p>'
+      + '<p style="margin-top:10px">Recovery route (if the site is deactivated): <a href="/recovery.html" style="text-decoration:underline;font-weight:700">/recovery.html</a></p></div>'
+      + '<div class="panel"><h2>Database backup & recovery</h2><p>Backups are managed in the Supabase dashboard for this project'
+      + (ref ? ' (<a href="https://supabase.com/dashboard/project/' + esc(ref) + '/settings/database" target="_blank" rel="noopener" style="text-decoration:underline;font-weight:700">open database settings</a>)' : '')
+      + '. Deactivating the website never deletes products, orders or customer records.</p>'
+      + '<p style="margin-top:10px" class="muted">Logo, brand colours and homepage content live in the website code and are deployed from GitHub. Ask the developer to change them.</p></div>';
+    $("cfg-form").addEventListener("submit", async function(e){
+      e.preventDefault();
+      var err = $("cfg-err"); err.textContent = "";
+      var wa = $("cfg-wa").value.trim().replace(/[^0-9]/g, "");
+      var th = $("cfg-threshold").value.trim();
+      if (wa.length < 10) { err.textContent = "Enter a valid WhatsApp number with country code."; return; }
+      try {
+        await api("settings_save", {
+          whatsapp_number: wa,
+          free_delivery_threshold: th,
+          currency: $("cfg-currency").value.trim() || "PKR"
+        });
+        toast("Settings saved.");
+      } catch (e2) { err.textContent = "Could not save: " + e2.message; }
+    });
+  } catch (e) {
+    el.innerHTML = errState(e.message);
+  }
+}
+
+/* ---------------- Super Admin ---------------- */
+async function renderSuper(){
+  var el = $("content");
+  el.innerHTML = '<p class="muted">Loading…</p>';
+  try {
+    if (!ensureGate()) return;
+    var st = await api("site_status") || { deactivated: false };
+    el.innerHTML = '<div class="notice warn"><strong>Emergency controls.</strong> Deactivation makes the entire public website a completely blank white page. It hides all public content but never deletes source code, database records, orders or customers. Recovery restores the site from the same controls or from <a href="/recovery.html" style="text-decoration:underline;font-weight:700">/recovery.html</a>.</div>'
+      + '<div class="panel"><h2>Emergency Website Deactivation</h2>'
+      + '<p>Current state: ' + (st.deactivated ? '<span class="badge cancelled">DEACTIVATED</span>' : '<span class="badge ok">LIVE</span>') + '</p>'
+      + (st.deactivated ? '<p class="muted" style="margin-top:6px">Deactivated by ' + esc(st.deactivated_by || "admin") + ' at ' + fmtDate(st.deactivated_at) + (st.reason ? ' — ' + esc(st.reason) : '') + '</p>' : '')
+      + '<form id="kill-form" style="margin-top:18px">'
+      + (st.deactivated ? "" : '<div class="field"><label for="kill-reason">Reason (optional, shown in the audit log)</label><input id="kill-reason" placeholder="e.g. Emergency maintenance"></div>')
+      + '<div class="field"><label for="kill-confirm">Type <strong>' + (st.deactivated ? "RESTORE" : "DEACTIVATE") + '</strong> to confirm</label><input id="kill-confirm" autocomplete="off" placeholder="' + (st.deactivated ? "RESTORE" : "DEACTIVATE") + '"></div>'
+      + '<p class="err" id="kill-err"></p>'
+      + '<button class="btn small ' + (st.deactivated ? "" : "danger") + '" type="submit">' + (st.deactivated ? "Restore the website" : "Deactivate the website") + '</button></form></div>';
+    $("kill-form").addEventListener("submit", async function(e){
+      e.preventDefault();
+      var err = $("kill-err"); err.textContent = "";
+      var want = st.deactivated ? "RESTORE" : "DEACTIVATE";
+      if ($("kill-confirm").value.trim() !== want) { err.textContent = "Type " + want + " exactly to confirm."; return; }
+      try {
+        var reason = st.deactivated ? "" : ($("kill-reason").value.trim() || "");
+        await api("site_set_deactivated", { deactivated: !st.deactivated, reason: reason });
+        toast(st.deactivated ? "Website restored." : "Website deactivated.");
+        renderSuper();
+      } catch (e2) { err.textContent = "Could not change site state: " + e2.message; }
+    });
+  } catch (e) {
+    el.innerHTML = errState(e.message);
+  }
+}
+
+/* ---------------- Global search ---------------- */
+async function globalSearch(q){
+  q = q.trim();
+  if (q.length < 2) return;
+  try {
+    if (!ensureGate()) return;
+    var results = await api("global_search", { q: q });
+    var prods = results.products || [], orders = results.orders || [], profs = results.profiles || [];
+    openModal('<h2>Search results for “' + esc(q) + '”</h2>'
+      + '<h3>Products</h3>' + (prods.length ? '<ul style="margin:6px 0 14px 18px">' + prods.map(function(p){ return '<li><a href="#" data-goto="products" style="text-decoration:underline;font-weight:700">' + esc(p.name) + '</a> — ' + (p.price_pkr == null ? "Price Coming Soon" : pkr(p.price_pkr)) + '</li>'; }).join("") + '</ul>' : '<p class="muted">No products match.</p>')
+      + '<h3>Orders</h3>' + (orders.length ? '<ul style="margin:6px 0 14px 18px">' + orders.map(function(o){ return '<li><a href="#" data-order-link="' + o.id + '" style="text-decoration:underline;font-weight:700">' + esc(o.order_code) + '</a> — ' + esc(o.customer_name) + ' — ' + pkr(o.total_pkr) + '</li>'; }).join("") + '</ul>' : '<p class="muted">No orders match.</p>')
+      + '<h3>Customers</h3>' + (profs.length ? '<ul style="margin:6px 0 14px 18px">' + profs.map(function(p){ return '<li><a href="#" data-goto="customers" style="text-decoration:underline;font-weight:700">' + esc(p.full_name || p.email) + '</a> — ' + esc(p.email) + '</li>'; }).join("") + '</ul>' : '<p class="muted">No customers match.</p>')
+      + '<div style="margin-top:14px"><button class="pillbtn" onclick="closeModal()">Close</button></div>');
+    document.querySelectorAll("[data-goto]").forEach(function(a){ a.addEventListener("click", function(e){ e.preventDefault(); closeModal(); goSection(a.getAttribute("data-goto")); }); });
+    document.querySelectorAll("[data-order-link]").forEach(function(a){ a.addEventListener("click", function(e){ e.preventDefault(); closeModal(); goSection("orders"); setTimeout(function(){ openOrder(a.getAttribute("data-order-link")); }, 150); }); });
+  } catch (e) { toast("Search failed: " + e.message); }
+}
+
+/* ---------------- Dispatcher & boot ---------------- */
+function loadSection(name){
+  cache.orders = cache.orders || null;
+  var map = { dashboard: renderDashboard, orders: renderOrders, products: function(){ renderProducts(false); },
+    packs: function(){ renderProducts(true); }, inventory: renderInventory, customers: renderCustomers,
+    carts: renderCarts, activity: renderActivity, audit: renderAudit, settings: renderSettings, super: renderSuper };
+  (map[name] || renderDashboard)();
+}
+
+document.addEventListener("DOMContentLoaded", function(){
+  $("gate-form").addEventListener("submit", submitGate);
+  $("signout-btn").addEventListener("click", function(){ signOut(false); });
+  $("hamb").addEventListener("click", function(){ $("sidebar").classList.toggle("open"); });
+  $("bell").addEventListener("click", function(){ var d = $("notifdrop"); d.style.display = d.style.display === "none" ? "" : "none"; });
+  document.addEventListener("click", function(e){
+    if (!e.target.closest || (!e.target.closest("#bell") && !e.target.closest("#notifdrop"))) $("notifdrop").style.display = "none";
+  });
+  $("top-search").addEventListener("keydown", function(e){ if (e.key === "Enter") { e.preventDefault(); globalSearch(this.value); } });
+
+  if (gateTokenValid()) {
+    enterShell();
+    probeDb();
+  } else {
+    showGate(true); $("gate-code").focus();
+  }
+});
+</script>
+</body>
+</html>

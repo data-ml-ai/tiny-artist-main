@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tiny Artist — A whole world of screen-free play.</title>
+<meta name="description" content="Tiny Artist: paintable creative figures and colour kits for children in Pakistan. Build your own pack, Cash on Delivery, free delivery on orders above Rs. 2,000.">
+<link rel="icon" type="image/png" href="assets/logo.png">
+<meta name="theme-color" content="#FFF8EE">
+<style>
+:root{--canvas:#FFF8EE;--ink:#263448;--coral:#F17F70;--sun:#F5CB68;--mint:#92D8C2;--sky:#A9D7EF;--lilac:#C5B2E8;--white:#fff;--muted:#5b6b82;--line:#f0e3d3;--radius:20px}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:"Nunito Sans",system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--canvas);color:var(--ink);line-height:1.55}
+h1,h2,h3,.brand{font-family:Fredoka,"Baloo 2",system-ui,sans-serif;font-weight:600;letter-spacing:.2px}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit;cursor:pointer}
+img{max-width:100%}
+.wrap{max-width:1160px;margin:0 auto;padding:0 20px}
+.announce{background:var(--ink);color:#fff;text-align:center;font-size:.86rem;padding:8px 12px;font-weight:600}
+header.site{position:sticky;top:0;z-index:50;background:rgba(255,248,238,.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.nav{display:flex;align-items:center;gap:18px;padding:12px 0;flex-wrap:wrap}
+.brand{font-size:1.45rem;display:flex;align-items:center;gap:9px}
+.brand .dot{width:34px;height:34px;border-radius:50%;background:conic-gradient(var(--coral) 0 25%,var(--sun) 0 50%,var(--mint) 0 75%,var(--sky) 0);display:inline-block;border:3px solid #fff;box-shadow:0 2px 8px rgba(38,52,72,.18)}
+.nav nav{display:flex;gap:16px;flex-wrap:wrap;font-weight:700;font-size:.95rem}
+.nav nav a{padding:6px 4px;border-radius:8px}
+.nav nav a:hover,.nav nav a:focus-visible{color:var(--coral);outline:none}
+.nav .spacer{flex:1}
+.searchbox{display:flex;gap:6px}
+.searchbox input{border:1.5px solid var(--line);border-radius:999px;padding:8px 14px;background:#fff;font:inherit;font-size:.9rem;width:170px}
+.cartbtn{position:relative;border:none;background:var(--coral);color:#fff;border-radius:999px;padding:9px 16px;font-weight:800}
+.cartbtn .count{position:absolute;top:-7px;right:-5px;background:var(--ink);color:#fff;border-radius:999px;font-size:.72rem;padding:2px 7px}
+.hero{padding:52px 0 30px}
+.hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:36px;align-items:center}
+.hero h1{font-size:clamp(2.1rem,5vw,3.4rem);line-height:1.08}
+.hero h1 .hl{background:linear-gradient(transparent 62%,var(--sun) 62%)}
+.hero p.lead{margin:16px 0 22px;font-size:1.08rem;color:var(--muted);max-width:34rem}
+.btn{display:inline-block;border:none;border-radius:999px;padding:13px 24px;font-weight:800;font-size:1rem;background:var(--coral);color:#fff;box-shadow:0 6px 16px rgba(241,127,112,.35)}
+.btn:hover{filter:brightness(1.05)}
+.btn.alt{background:#fff;color:var(--ink);border:2px solid var(--ink);box-shadow:none;margin-left:10px}
+.btn.small{padding:8px 16px;font-size:.9rem}
+.btn:disabled{opacity:.55;cursor:not-allowed}
+.hero-img{background:#fff;border-radius:28px;padding:14px;box-shadow:0 18px 40px rgba(38,52,72,.12);transform:rotate(1.2deg)}
+.hero-img img{border-radius:20px;display:block;width:100%}
+.hero-img figcaption{font-size:.82rem;color:var(--muted);padding:10px 4px 2px;text-align:center}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:20px}
+.chip{background:#fff;border:1.5px solid var(--line);border-radius:999px;padding:6px 13px;font-size:.83rem;font-weight:700}
+section.block{padding:44px 0}
+section.block h2{font-size:clamp(1.5rem,3vw,2.1rem);margin-bottom:8px}
+section.block .sub{color:var(--muted);margin-bottom:22px;max-width:44rem}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px;align-items:center}
+.toolbar select,.toolbar input{border:1.5px solid var(--line);border-radius:999px;padding:9px 14px;background:#fff;font:inherit;font-size:.92rem}
+.pillbtn{border:1.5px solid var(--line);background:#fff;border-radius:999px;padding:8px 15px;font-weight:700;font-size:.9rem}
+.pillbtn.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:18px}
+.card{background:var(--white);border-radius:var(--radius);overflow:hidden;box-shadow:0 6px 18px rgba(38,52,72,.07);display:flex;flex-direction:column;border:1px solid #fbf1e2}
+.tile{height:150px;display:flex;align-items:center;justify-content:center;position:relative}
+.tile .glyph{font-size:3.4rem;filter:drop-shadow(0 4px 6px rgba(38,52,72,.18))}
+.tile .figimg{height:140px;max-width:92%;object-fit:contain}
+.selitem .figimg{height:64px;max-width:100%;object-fit:contain;display:block;margin:0 auto}
+.viewer .figimg{max-width:min(280px,80%);max-height:280px;object-fit:contain}
+.tile .soon{position:absolute;bottom:10px;right:10px;background:#fff;border-radius:999px;font-size:.7rem;font-weight:800;padding:3px 9px;color:var(--muted)}
+.card .body{padding:14px 16px 16px;display:flex;flex-direction:column;gap:6px;flex:1}
+.card h3{font-size:1.05rem}
+.cat{font-size:.78rem;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:var(--muted)}
+.price{font-weight:800}
+.price.coming{color:var(--coral)}
+.card .row{display:flex;gap:8px;margin-top:auto;padding-top:8px}
+.card .row .btn{flex:1;text-align:center}
+.ghostbtn{border:2px solid var(--line);background:#fff;border-radius:999px;padding:9px 14px;font-weight:800;flex:1}
+.ghostbtn:hover{border-color:var(--ink)}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.panel{background:#fff;border-radius:var(--radius);padding:24px;box-shadow:0 6px 18px rgba(38,52,72,.07)}
+.swatches{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.sw{width:34px;height:34px;border-radius:50%;border:2.5px solid #fff;box-shadow:0 2px 6px rgba(38,52,72,.25)}
+.swlabel{font-size:.85rem;font-weight:700;display:flex;align-items:center;gap:7px}
+.swrow{display:flex;gap:14px;flex-wrap:wrap}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.step{background:#fff;border-radius:var(--radius);padding:22px;text-align:center;box-shadow:0 6px 18px rgba(38,52,72,.07)}
+.step .n{width:44px;height:44px;border-radius:50%;margin:0 auto 10px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:1.15rem;color:#fff}
+.benefits{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px}
+.benefit{background:#fff;border-radius:var(--radius);padding:20px;box-shadow:0 6px 18px rgba(38,52,72,.06)}
+.benefit .ic{font-size:1.7rem}
+table{width:100%;border-collapse:collapse;font-size:.93rem}
+th,td{text-align:left;padding:10px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:.78rem;text-transform:uppercase;letter-spacing:.5px;color:var(--muted)}
+.qtybtn{border:1.5px solid var(--line);background:#fff;width:28px;height:28px;border-radius:50%;font-weight:900}
+.progress{height:12px;background:#f3e7d7;border-radius:999px;overflow:hidden;margin:10px 0}
+.progress>div{height:100%;background:linear-gradient(90deg,var(--mint),var(--sun));width:0;transition:width .3s}
+form .field{margin-bottom:14px}
+form label{display:block;font-weight:700;font-size:.9rem;margin-bottom:5px}
+form input,form textarea,form select{width:100%;border:1.5px solid var(--line);border-radius:12px;padding:11px 13px;font:inherit;background:#fff}
+.notice{border-radius:14px;padding:13px 16px;font-size:.92rem;margin-bottom:16px}
+.notice.demo{background:#fdf3d8;border:1.5px solid var(--sun)}
+.notice.info{background:#e8f4fb;border:1.5px solid var(--sky)}
+.faq{background:#fff;border-radius:16px;margin-bottom:10px;box-shadow:0 4px 12px rgba(38,52,72,.05)}
+.faq summary{cursor:pointer;padding:16px 18px;font-weight:800;list-style:none}
+.faq p{padding:0 18px 16px;color:var(--muted)}
+footer.site{background:var(--ink);color:#e9eef5;margin-top:40px;padding:38px 0 26px}
+footer.site a{color:#fff;font-weight:700}
+footer .cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:22px;margin-bottom:22px}
+footer h4{color:#fff;margin-bottom:10px}
+footer li{list-style:none;margin-bottom:6px;font-size:.93rem}
+.wa{position:fixed;right:18px;bottom:18px;z-index:60;background:#25D366;color:#fff;border:none;border-radius:999px;padding:12px 18px;font-weight:800;box-shadow:0 8px 20px rgba(38,52,72,.25);display:flex;gap:8px;align-items:center}
+.wa small{background:var(--ink);color:#fff;border-radius:999px;padding:2px 8px;font-size:.68rem}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(80px);background:var(--ink);color:#fff;padding:12px 20px;border-radius:999px;font-weight:700;z-index:99;transition:transform .3s;box-shadow:0 10px 24px rgba(0,0,0,.25);max-width:92vw;text-align:center}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.view{display:none}
+.view.on{display:block}
+.selgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.selitem{background:#fff;border:2.5px solid var(--line);border-radius:16px;padding:14px 10px;text-align:center;cursor:pointer}
+.selitem .glyph{font-size:2rem;display:block}
+.selitem.sel{border-color:var(--coral);background:#fff3f0;box-shadow:0 6px 14px rgba(241,127,112,.2)}
+.selitem .qrow{display:none;justify-content:center;gap:8px;align-items:center;margin-top:8px}
+.selitem.sel .qrow{display:flex}
+.packopt{display:flex;gap:12px;flex-wrap:wrap}
+.packopt .panel{flex:1;min-width:240px;cursor:pointer;border:2.5px solid transparent}
+.packopt .panel.sel{border-color:var(--coral)}
+.metric{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:20px}
+.metric .m{background:#fff;border-radius:16px;padding:18px;box-shadow:0 6px 16px rgba(38,52,72,.06)}
+.metric .m b{font-size:1.5rem;display:block}
+.metric .m span{font-size:.82rem;color:var(--muted);font-weight:700}
+.badge{display:inline-block;border-radius:999px;padding:2px 10px;font-size:.72rem;font-weight:800;background:var(--lilac);color:var(--ink)}
+.badge.sample{background:var(--sun)}
+.badge.anon{background:#e3e8ef}
+.adminbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+.viewer{text-align:center}
+.viewer .stage{border-radius:24px;padding:36px 10px;overflow:hidden}
+.viewer .glyph{display:inline-block;font-size:6rem;transition:transform .2s;filter:drop-shadow(0 10px 14px rgba(38,52,72,.2))}
+.viewer .ctl{display:flex;gap:8px;justify-content:center;margin-top:14px;flex-wrap:wrap}
+@media(max-width:820px){.hero-grid,.split,.steps{grid-template-columns:1fr}.nav nav{display:none}.nav nav.open{display:flex;flex-basis:100%}.searchbox input{width:120px}}
+.burger{display:none;border:none;background:#fff;border:1.5px solid var(--line);border-radius:10px;padding:7px 12px;font-weight:900}
+@media(max-width:820px){.burger{display:block}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+.brand img.logo{width:40px;height:40px;border-radius:50%;object-fit:cover;background:#fff;box-shadow:0 2px 8px rgba(38,52,72,.18)}
+.tile.pic{height:auto;padding:0;background:#fff}
+.kitimg{width:100%;aspect-ratio:1/1;object-fit:contain;display:block;background:#fff}
+.detailimg{width:100%;display:block;border-radius:20px;background:#fff}
+.err{color:#b3261e;font-size:.85rem;font-weight:700;margin-top:4px;display:none}
+</style>
+</head>
+<body>
+<div class="announce" id="announce">Creative play, away from screens.</div>
+<header class="site"><div class="wrap nav">
+  <a class="brand" href="#/" data-nav><img class="logo" src="assets/logo.png" alt="Tiny Artist logo" width="40" height="40">TINY&nbsp;ARTIST</a>
+  <button class="burger" id="burger" aria-label="Open menu">☰</button>
+  <nav id="mainnav" aria-label="Main">
+    <a href="#/" data-nav>Home</a><a href="#/shop" data-nav>Shop</a><a href="#/build-your-pack" data-nav>Build Your Own Pack</a><a href="#/about" data-nav>About Us</a><a href="#/faq" data-nav>FAQ</a><a href="#/contact" data-nav>Contact</a>
+  </nav>
+  <div class="spacer"></div>
+  <form class="searchbox" id="searchform"><input id="searchinput" type="search" placeholder="Search products…" aria-label="Search products"><button class="pillbtn" type="submit">Search</button></form>
+  <button class="cartbtn" id="cartbtn">🛒 Cart <span class="count" id="cartcount">0</span></button>
+</div></header>
+<noscript><div class="wrap"><p class="notice info" style="margin-top:16px">Tiny Artist needs JavaScript to show products and take WhatsApp orders. Please enable JavaScript, or order directly on WhatsApp at +92 309 8426672.</p></div></noscript>
+<main id="app" class="wrap" style="min-height:60vh"></main>
+<button class="wa" id="wabtn" aria-label="Chat with Tiny Artist on WhatsApp">💬 WhatsApp</button>
+<div class="toast" id="toast" role="status"></div>
+<footer class="site"><div class="wrap">
+  <div class="cols">
+    <div><h4>TINY ARTIST</h4><p style="font-size:.93rem">A whole world of screen-free play. Cute paintable figures and colour kits, made for little creators in Pakistan.</p></div>
+    <div><h4>Shop</h4><ul><li><a href="#/shop" data-nav>All Figures</a></li><li><a href="#/build-your-pack" data-nav>Build Your Own Pack</a></li><li><a href="#/cart" data-nav>Cart</a></li></ul></div>
+    <div><h4>Help</h4><ul><li><a href="#/about" data-nav>About Us</a></li><li><a href="#/faq" data-nav>FAQ</a></li><li><a href="#/contact" data-nav>Contact</a></li></ul></div>
+    <div><h4>Good to know</h4><ul><li>Cash on Delivery across Pakistan</li><li>Free delivery on orders above <span class="js-threshold">Rs. 2,000</span></li><li>Email: <a href="mailto:musamahmood20002512@gmail.com">musamahmood20002512@gmail.com</a></li><li>WhatsApp: <a href="https://wa.me/923098426672" target="_blank" rel="noopener">+92 309 8426672</a></li></ul></div>
+  </div>
+  <p style="font-size:.88rem;border-top:1px solid #3a4c68;padding-top:16px">Created and developed by <a href="https://0ne-6-agency.netlify.app/" target="_blank" rel="noopener">ONE.6 Agency</a> · © 2026 Tiny Artist · Orders are placed via WhatsApp and confirmed by the Tiny Artist team in chat.</p>
+</div></footer>
+<script src="supabase-config.js"></script>
+<script>
+"use strict";
+/* ---------- Data (every figure costs Rs. 70 by default — owner-confirmed 2026-11-16; admin overrides save per device) ---------- */
+const PRODUCTS=[
+{id:1,name:"Cute Baby Astronaut",slug:"cute-baby-astronaut",price:70,img:"assets/figures/cute-baby-astronaut.webp",cat:"Space",glyph:"👨‍🚀",color:"#A9D7EF",desc:"A tiny astronaut ready for a colourful mission beyond the stars.",bg:"radial-gradient(circle at 30% 20%,#35507a,#263448 70%)"},
+{id:2,name:"Honey Jar",slug:"honey-jar",price:70,img:"assets/figures/honey-jar.webp",cat:"Food & Drinks",glyph:"🍯",color:"#F5CB68",desc:"A sweet little honey jar, waiting for golden yellows and warm ambers."},
+{id:3,name:"Football",slug:"football",price:70,img:"assets/figures/football.webp",cat:"Everyday Objects",glyph:"⚽",color:"#92D8C2",desc:"A classic football figure for little sports fans to paint their way."},
+{id:4,name:"Burger",slug:"burger",price:70,img:"assets/figures/burger.webp",cat:"Food & Drinks",glyph:"🍔",color:"#F17F70",desc:"A cheerful burger figure — stack it with your favourite colours."},
+{id:5,name:"Planet Earth",slug:"planet-earth",price:70,img:"assets/figures/planet-earth.webp",cat:"Space",glyph:"🌍",color:"#A9D7EF",desc:"Our home planet in miniature, ready for blues, greens and imagination.",bg:"radial-gradient(circle at 30% 20%,#35507a,#263448 70%)"},
+{id:6,name:"Honey Dipper",slug:"honey-dipper",price:70,img:"assets/figures/honey-dipper.webp",cat:"Food & Drinks",glyph:"🍦",color:"#F5CB68",desc:"A swirly honey dipper figure, perfect for warm honey tones."},
+{id:7,name:"French Fries",slug:"french-fries",price:70,img:"assets/figures/french-fries.webp",cat:"Food & Drinks",glyph:"🍟",color:"#F17F70",desc:"Crispy little fries in their carton — paint them golden."},
+{id:8,name:"Rocket",slug:"rocket",price:70,img:"assets/figures/rocket.webp",cat:"Space",glyph:"🚀",color:"#C5B2E8",desc:"A rocket ready for lift-off in whatever colours you dream up.",bg:"radial-gradient(circle at 30% 20%,#35507a,#263448 70%)"},
+{id:9,name:"Airplane",slug:"airplane",price:70,img:"assets/figures/airplane.webp",cat:"Everyday Objects",glyph:"✈️",color:"#A9D7EF",desc:"A friendly little airplane for high-flying colour adventures."},
+{id:10,name:"Seashell",slug:"seashell",price:70,img:"assets/figures/seashell.webp",cat:"Ocean",glyph:"🐚",color:"#F5CB68",desc:"A gentle seashell figure, straight from an imaginary beach.",bg:"linear-gradient(160deg,#dff3fb,#A9D7EF)"},
+{id:11,name:"Flower",slug:"flower",price:70,img:"assets/figures/flower.webp",cat:"Nature",glyph:"🌼",color:"#92D8C2",desc:"A happy flower that can bloom in every colour of the rainbow."},
+{id:12,name:"Cola Drink",slug:"cola-drink",price:70,img:"assets/figures/cola-drink.webp",cat:"Food & Drinks",glyph:"🥤",color:"#F17F70",desc:"A fizzy cola cup figure — pick your flavour, pick your colours."},
+{id:13,name:"Cute Whale",slug:"cute-whale",price:70,img:"assets/figures/cute-whale.webp",cat:"Ocean",glyph:"🐳",color:"#A9D7EF",desc:"A smiling little whale, ready to make a splash of colour.",bg:"linear-gradient(160deg,#dff3fb,#A9D7EF)"},
+{id:14,name:"Bus",slug:"bus",price:70,img:"assets/figures/bus.webp",cat:"Everyday Objects",glyph:"🚌",color:"#F5CB68",desc:"A cheerful little bus — every window a new colour stop."},
+{id:15,name:"Small Igloo House",slug:"igloo-house",price:70,img:"assets/figures/igloo-house.webp",cat:"Everyday Objects",glyph:"🏠",color:"#C5B2E8",desc:"A cosy little igloo house, ready to be decorated your way."},
+{id:16,name:"Crab",slug:"crab",price:70,img:"assets/figures/crab.webp",cat:"Ocean",glyph:"🦀",color:"#F17F70",desc:"A friendly little crab with claws full of creative ideas.",bg:"linear-gradient(160deg,#dff3fb,#A9D7EF)"}
+];
+let WA_NUMBER="923098426672";
+let WA_DISPLAY="+92 309 8426672";
+/* Painting kits: prices are fixed from the supplied posters (verified 2026-11-16).
+   Do not change these without a new poster/price confirmation from the owner. */
+const KITS=[
+{id:"kit-20",slug:"20-pcs-painting-set",name:"20 Pcs Painting Set",cat:"Painting Kits",price:1000,img:"assets/kit-20pcs.png",webp:"assets/kit-20pcs.webp",desc:"20 paintable pieces with 12 colours. Free Cash on Delivery.",contents:["20 paintable pieces","12 colours","Paint brushes as shown on the poster","Free Cash on Delivery"]},
+{id:"kit-30",slug:"30-pcs-painting-kit",name:"30 Pcs Painting Kit",cat:"Painting Kits",price:1300,img:"assets/kit-30pcs.png",webp:"assets/kit-30pcs.webp",desc:"30 paintable pieces with a 12-colour strip, 3 big colours and 4 brushes.",contents:["30 paintable pieces","12 Colour Strip","3 Big Colours","4 Brushes"]}
+];
+const PACKS=[
+{id:"small",name:"Small Colour Pack",colors:[["Green","#3FA34D"],["Pink","#F28BB4"],["Orange","#F59E42"],["Black","#263448"]],priceKey:"pack-small"},
+{id:"large",name:"Large Colour Pack",colors:[["Red","#E14B4B"],["Yellow","#F5CB68"],["Blue","#3E7CB1"],["Green","#3FA34D"],["Pink","#F28BB4"],["Orange","#F59E42"],["Black","#263448"]],priceKey:"pack-large"}
+];
+const BRUSH="Red-handled paintbrush with black bristles";
+const FAQS=[
+["What is Tiny Artist?","Tiny Artist is a little world of imagination, creativity and colour. We offer paintable figures and colour packs so children can choose colours, explore ideas and make every little creation their own — completely screen-free."],
+["What comes in a colour pack?","The Small Colour Pack includes green, pink, orange and black paints plus a red-handled paintbrush with black bristles. The Large Colour Pack includes red, yellow, blue, green, pink, orange and black paints plus the same brush."],
+["What figures can I choose?","There are 16 figures: astronaut, honey jar, football, burger, planet earth, honey dipper, french fries, rocket, airplane, seashell, flower, cola drink, whale, bus, igloo house and crab."],
+["Can I build my own pack?","Yes. Open Build Your Own Pack, tap the figures you love, choose the Small or Large Colour Pack, and add your custom pack to the cart as one item."],
+["Is Cash on Delivery available?","Yes, Cash on Delivery is available across Pakistan. Place your order through WhatsApp from the checkout page and the Tiny Artist team will confirm it in chat before anything is shipped."],
+["When do I qualify for free delivery?","Orders with a subtotal above Rs. 2,000 qualify for free delivery. The cart shows a progress bar telling you how much more you need."],
+["What should I know about product safety?","Figures and paints are for creative play with adult supervision for young children. Specific safety and non-toxic documentation will be published with the final products — we do not make claims we cannot document."],
+["How can I contact Tiny Artist?","Email us at musamahmood20002512@gmail.com, or tap the WhatsApp button on any page to chat with us on +92 309 8426672."]];
+const SAMPLE_CARTS=[]; /* No fake customers: cart activity below shows only real data from this device. */
+/* ---------- Store (localStorage, per visitor) ---------- */
+const LS={get(k,d){try{const v=localStorage.getItem("ta-"+k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem("ta-"+k,JSON.stringify(v))}catch(e){}}};
+let cart=LS.get("cart",[]);            // {kind:'product'|'pack', id/name, qty, detail}
+let prices=LS.get("prices",{});        // slug or pack id -> admin override number | absent = default price (figures Rs. 70) or Price Coming Soon (packs)
+let orders=LS.get("orders",[]);
+let events=LS.get("events",[]);
+let settings=Object.assign({threshold:2000,announce:["Creative play, away from screens.","Cash on Delivery available across Pakistan.","Free delivery on qualifying orders above Rs. 2,000."]},LS.get("settings",{}));
+let packSel=LS.get("packSel",{items:{},pack:"small"});
+let adminOn=sessionStorage.getItem("ta-admin")==="1";
+let waSubmitting=false; /* duplicate-submission guard for WhatsApp checkout */
+/* ---------- Site kill switch (emergency deactivation) ----------
+   BACKEND_CONFIG.enabled=false means: no server write API is connected yet.
+   Status sources, in order: (1) server API when wired, (2) Supabase
+   site_settings when supabase-config.js is configured (see
+   SUPABASE-CONNECT.md), (3) the deployed site-status.json file, (4) this
+   browser's local preview flag (LS "deactivated"). A definite Supabase
+   answer wins over the file; any Supabase failure falls through to the
+   file. When Phase 2 is fully wired, set enabled=true and statusApi
+   to the server endpoint; the database (site_settings + is_admin())
+   becomes the source of truth. Deactivation is never decided from a URL. */
+const BACKEND_CONFIG={enabled:false,statusApi:""};
+let siteDeactivated=LS.get("deactivated",false)===true;
+function applyBlankPage(){document.title="";try{document.body.innerHTML=""}catch(e){}try{const st=document.createElement("style");st.textContent="html,body{background:#fff!important;margin:0!important;padding:0!important}";document.head.appendChild(st)}catch(e){}try{document.body.style.background="#fff"}catch(e){}}
+async function fetchSiteStatus(){if(BACKEND_CONFIG.enabled&&BACKEND_CONFIG.statusApi){try{const r=await fetch(BACKEND_CONFIG.statusApi,{cache:"no-store"});if(r.ok){const s=await r.json();return !!(s&&s.deactivated===true)}}catch(e){}}try{const sb=(typeof window!=="undefined")?window.TINY_ARTIST_SUPABASE:null;if(sb&&sb.configured&&typeof sb.fetchDeactivated==="function"&&typeof fetch==="function"){const d=await sb.fetchDeactivated();if(d===true)return true;if(d===false)return false}}catch(e){}if(typeof fetch==="function"){try{const r=await fetch("site-status.json?v="+Date.now(),{cache:"no-store"});if(r.ok){const s=await r.json();if(s&&s.deactivated===true)return true}}catch(e){}}return LS.get("deactivated",false)===true}
+async function bootSite(){try{siteDeactivated=await fetchSiteStatus()}catch(e){siteDeactivated=LS.get("deactivated",false)===true}if(siteDeactivated){applyBlankPage();return}try{await refreshConfig()}catch(e){}try{await refreshCatalogue()}catch(e){}logEvent("page_view",location.hash);render()}
+function saveAll(){LS.set("cart",cart);LS.set("prices",prices);LS.set("orders",orders);LS.set("events",events);LS.set("settings",settings);LS.set("packSel",packSel)}
+
+/* ---------- Live catalogue, settings, orders & activity (Supabase) ----------
+   All of this is best-effort: if Supabase is unreachable or the schema has
+   not been applied yet, the hardcoded catalogue and local behaviour stay
+   exactly as they were. Nothing here ever blocks shopping or WhatsApp. */
+let DB_IDS={};
+let TA_SESSION=LS.get("taSession","");if(!TA_SESSION){TA_SESSION="s-"+Date.now().toString(36)+"-"+Math.random().toString(36).slice(2,10);LS.set("taSession",TA_SESSION)}
+function sbClient(){try{const sb=(typeof window!=="undefined")?window.TINY_ARTIST_SUPABASE:null;if(!sb||!sb.configured||typeof fetch!=="function")return null;return{url:String(sb.url).replace(/\/+$/,""),key:sb.publishableKey}}catch(e){return null}}
+function logEventRemote(type,detail){try{const c=sbClient();if(!c)return;fetch(c.url+"/rest/v1/analytics_events",{method:"POST",headers:{apikey:c.key,Authorization:"Bearer "+c.key,"Content-Type":"application/json",Prefer:"return=minimal"},body:JSON.stringify({event_type:type,detail:detail||"",session_id:TA_SESSION,path:(typeof location!=="undefined"?location.hash||"/":"/"),user_agent:(typeof navigator!=="undefined"?navigator.userAgent||"":"")})}).catch(function(){})}catch(e){}}
+async function refreshConfig(){const c=sbClient();if(!c)return;try{const ctl=(typeof AbortController!=="undefined")?new AbortController():null;const to=ctl?setTimeout(function(){try{ctl.abort()}catch(e){}},4000):null;let rows;try{const r=await fetch(c.url+"/rest/v1/site_config?select=key,value",{headers:{apikey:c.key,Authorization:"Bearer "+c.key,Accept:"application/json"},signal:ctl?ctl.signal:undefined});if(!r.ok)return;rows=await r.json()}finally{if(to)clearTimeout(to)}if(!Array.isArray(rows))return;const map={};rows.forEach(function(x){map[x.key]=x.value});if(map.whatsapp_number&&/^[0-9]{10,15}$/.test(map.whatsapp_number)){WA_NUMBER=map.whatsapp_number;WA_DISPLAY="+"+map.whatsapp_number}const th=parseInt(map.free_delivery_threshold,10);if(!isNaN(th)&&th>=0){settings.threshold=th;saveAll()}}catch(e){}}
+async function refreshCatalogue(){const c=sbClient();if(!c)return;try{const ctl=(typeof AbortController!=="undefined")?new AbortController():null;const to=ctl?setTimeout(function(){try{ctl.abort()}catch(e){}},4000):null;let rows;try{const r=await fetch(c.url+"/rest/v1/products?select=id,slug,name,description,price_pkr,is_kit,is_available,contents,categories(name)",{headers:{apikey:c.key,Authorization:"Bearer "+c.key,Accept:"application/json"},signal:ctl?ctl.signal:undefined});if(!r.ok)return;rows=await r.json()}finally{if(to)clearTimeout(to)}if(!Array.isArray(rows)||!rows.length)return;DB_IDS={};rows.forEach(function(p){DB_IDS[p.slug]={id:p.id,price:p.price_pkr}});const figs=rows.filter(function(p){return !p.is_kit&&p.is_available});if(figs.length){const merged=figs.map(function(dp){const hc=PRODUCTS.find(function(x){return x.slug===dp.slug})||{};const m={slug:dp.slug,name:dp.name||hc.name||dp.slug,desc:dp.description||hc.desc||"",cat:(dp.categories&&dp.categories.name)||hc.cat||"Everyday Objects",glyph:hc.glyph||"🎨",color:hc.color||"#F5CB68",img:hc.img};if(typeof dp.price_pkr==="number")m.price=dp.price_pkr;return m});PRODUCTS.length=0;merged.forEach(function(m){PRODUCTS.push(m)})}rows.filter(function(p){return p.is_kit&&p.is_available&&typeof p.price_pkr==="number"&&!KITS.some(function(x){return x.slug===p.slug})}).forEach(function(k){KITS.push({slug:k.slug,name:k.name,desc:k.description||"",cat:"Painting Kits",price:k.price_pkr,contents:Array.isArray(k.contents)?k.contents:[],dbKit:true})})}catch(e){}}
+function submitOrderToBackend(d,snapshot){try{const c=sbClient();if(!c)return;const items=[];for(const i of snapshot){if(i.kind==="kit"||i.kind==="product"){const m=DB_IDS[i.slug];if(!m)return;items.push({product_id:m.id,quantity:i.qty})}else if(i.kind==="pack"){const pm=DB_IDS[i.pack==="small"?"small-colour-pack":"large-colour-pack"];if(!pm)return;const figs=[];for(const s in i.items){const fm=DB_IDS[s];if(!fm)return;figs.push({product_id:fm.id,quantity:i.items[s]})}items.push({quantity:i.qty,custom_pack:{pack_product_id:pm.id,figures:figs}})}}if(!items.length)return;fetch(c.url+"/rest/v1/rpc/create_order",{method:"POST",headers:{apikey:c.key,Authorization:"Bearer "+c.key,"Content-Type":"application/json",Prefer:"return=representation"},body:JSON.stringify({p_customer:{name:d.name,phone:d.phone,address:d.address,city:d.city,instructions:d.note||""},p_items:items})}).catch(function(){})}catch(e){}}
+function logEvent(type,detail){try{if(navigator.webdriver)return}catch(e){}events.push({type,detail:detail||"",at:Date.now()});if(events.length>500)events.splice(0,events.length-500);saveAll();logEventRemote(type,detail)}
+function fmt(n){return "Rs. "+Number(n).toLocaleString("en-PK")}
+function priceOf(slug){const k=KITS.find(x=>x.slug===slug);if(k)return k.price;const p=prices[slug];if(typeof p==="number"&&p>0)return p;const pr=PRODUCTS.find(x=>x.slug===slug);return pr&&typeof pr.price==="number"?pr.price:null}
+function priceHTML(slug){const p=priceOf(slug);return p?`<span class="price">${fmt(p)}</span>`:`<span class="price coming">Price Coming Soon</span>`}
+function cartCount(){return cart.reduce((s,i)=>s+i.qty,0)}
+function pkr(n){return "PKR "+Number(n).toLocaleString("en-PK")}
+function kitBySlug(slug){return KITS.find(k=>k.slug===slug)}
+function lineTotal(i){if(i.kind==="kit")return priceOf(i.slug)*i.qty;if(i.kind==="product"){const p=priceOf(i.slug);return p===null?null:p*i.qty}const pk=PACKS.find(p=>p.id===i.pack);let t=pk?priceOf(pk.priceKey):null;if(t===null)return null;for(const s in i.items){const p=priceOf(s);if(p===null)return null;t+=p*i.items[s]}return t*i.qty}
+function cartSubtotal(){let total=0;for(const i of cart){const t=lineTotal(i);if(t===null)return null;total+=t}return total}
+function unpricedItems(){const names=[];for(const i of cart){if(lineTotal(i)===null)names.push(i.name)}return names}
+function deliveryInfo(sub){return sub>settings.threshold?{label:"FREE"}:{label:"To Be Confirmed"}}
+function cartMessageLines(){return cart.map(i=>{const t=lineTotal(i);if(i.kind==="pack"){const pk=PACKS.find(p=>p.id===i.pack);const figs=Object.keys(i.items).map(s=>{const p=PRODUCTS.find(x=>x.slug===s);return p.name+" × "+i.items[s]}).join(", ");return "Custom Pack — "+pk.name+" ("+figs+") × "+i.qty+" — "+pkr(t)}return i.name+" × "+i.qty+" — "+pkr(t)})}
+function toast(msg){const t=document.getElementById("toast");t.textContent=msg;t.classList.add("show");clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove("show"),2600)}
+function esc(s){return String(s||"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+/* ---------- Announce rotation + header ---------- */
+let annI=0;setInterval(()=>{annI=(annI+1)%settings.announce.length;document.getElementById("announce").textContent=settings.announce[annI]},4500);
+document.getElementById("announce").textContent=settings.announce[0];
+function syncHeader(){document.getElementById("cartcount").textContent=cartCount();document.querySelectorAll(".js-threshold").forEach(e=>e.textContent=fmt(settings.threshold))}
+document.getElementById("cartbtn").onclick=()=>location.hash="#/cart";
+document.getElementById("burger").onclick=()=>document.getElementById("mainnav").classList.toggle("open");
+document.getElementById("wabtn").onclick=()=>{location.href="https://wa.me/"+WA_NUMBER+"?text="+encodeURIComponent("Hello Tiny Artist! I have a question.")};
+document.getElementById("searchform").onsubmit=e=>{e.preventDefault();location.hash="#/shop?q="+encodeURIComponent(document.getElementById("searchinput").value.trim())};
+/* ---------- Views ---------- */
+const app=document.getElementById("app");
+function figFallback(img){const g=document.createElement("span");g.className="glyph";g.setAttribute("aria-hidden","true");g.textContent=img.dataset.glyph;img.replaceWith(g)}
+function figMedia(p){if(!p.img)return `<span class="glyph" aria-hidden="true">${p.glyph}</span>`;return `<img class="figimg" src="${p.img}" alt="${esc(p.name)} paintable figure" loading="lazy" decoding="async" data-glyph="${p.glyph}" onerror="figFallback(this)">`}
+function productCard(p){return `<article class="card"><div class="tile" style="background:${p.color}33">${figMedia(p)}<span class="soon">Paintable figure</span></div><div class="body"><span class="cat">${p.cat}</span><h3>${p.name}</h3><p style="color:var(--muted);font-size:.9rem">${p.desc}</p>${priceHTML(p.slug)}<div class="row"><button class="ghostbtn" onclick="go('#/product/${p.slug}')">View</button><button class="btn small" onclick="addProduct('${p.slug}')">Add to Cart</button></div></div></article>`}
+function kitPicture(k,cls){if(!k.img)return `<span style="font-size:4.5rem;line-height:1;display:block;text-align:center;padding:34px 0">🎨</span>`;return `<picture><source srcset="${k.webp}" type="image/webp"><img class="${cls||"kitimg"}" src="${k.img}" alt="${esc(k.name)} poster" loading="lazy" decoding="async" width="400" height="400"></picture>`}
+function kitCard(k){return `<article class="card"><div class="tile pic">${kitPicture(k)}</div><div class="body"><span class="cat">${k.cat}</span><h3>${k.name}</h3><p style="color:var(--muted);font-size:.9rem">${k.desc}</p><span class="price">${pkr(k.price)}</span><div class="row"><button class="ghostbtn" onclick="go('#/product/${k.slug}')">View</button><button class="btn small" onclick="addKit('${k.slug}')">Add to Cart</button></div></div></article>`}
+function packPanel(pk,sel){return `<div class="panel ${sel?"sel":""}" ${sel!==undefined?`onclick="choosePack('${pk.id}')" role="button" tabindex="0"`:""}><h3>${pk.name}</h3><div class="swrow">${pk.colors.map(c=>`<span class="swlabel"><span class="sw" style="background:${c[1]}"></span>${c[0]}</span>`).join("")}</div><p style="margin-top:10px;font-size:.92rem">+ ${BRUSH}</p><p style="margin-top:8px">${priceHTML(pk.id==="small"?"pack-small":"pack-large")}</p></div>`}
+function homeView(){return `
+<section class="hero"><div class="hero-grid"><div>
+<h1>A whole world of <span class="hl">screen-free play.</span></h1>
+<p class="lead">Discover cute little figures, pick your favourite colours and create something that is completely yours.</p>
+<button class="btn" onclick="go('#/build-your-pack')">Build Your Own Pack</button><button class="btn alt" onclick="go('#/shop')">Explore All Figures</button>
+<div class="chips"><span class="chip">🎨 16 paintable figures</span><span class="chip">💵 Cash on Delivery</span><span class="chip">🚚 Free delivery above ${fmt(settings.threshold)}</span><span class="chip">📵 No screens, no batteries</span></div>
+</div><figure class="hero-img"><picture><source srcset="assets/collection.webp" type="image/webp"><img src="collection.jpg" alt="The Tiny Artist collection: sixteen unpainted paintable figures with paint pots and brushes" loading="lazy" decoding="async"></picture><figcaption>The full Tiny Artist collection — 16 figures, paints and brushes, ready to paint.</figcaption></figure></div></section>
+<section class="block"><h2>Painting Kits</h2><p class="sub">Complete kits with figures, colours and brushes — ready to paint. Prices include everything shown on the poster.</p><div class="grid">${KITS.map(kitCard).join("")}</div></section>
+<section class="block"><h2>Shop by Figure</h2><p class="sub">Every figure starts plain white and becomes whatever your little artist imagines. Tap View for a closer look, or add straight to your cart.</p><div class="grid">${PRODUCTS.map(productCard).join("")}</div></section>
+<section class="block" style="background:#fff;border-radius:28px;padding:36px 28px"><h2>Your Creativity. Your Collection.</h2><p class="sub">Choose your favourite figures, add a small or large colour pack, and we will put your personal kit together as one custom pack.</p><button class="btn" onclick="go('#/build-your-pack')">Build My Pack</button></section>
+<section class="block"><h2>Colour Packs</h2><p class="sub">Two packs, shown exactly as they come. Note: in the Small Pack, red is the colour of the brush handle — it is not one of the paints.</p><div class="split">${PACKS.map(p=>packPanel(p)).join("")}</div></section>
+<section class="block" style="background:#fff;border-radius:28px;padding:36px 28px"><h2>Coming Soon</h2><p class="sub">New painting kits and figure designs are on the way. Shopping stays open while we prepare them — the kits above are available to order now via WhatsApp.</p><div class="chips"><span class="chip">🎁 New kit designs</span><span class="chip">🎨 More figure sets</span><span class="chip">📦 Seasonal packs</span></div><p style="margin-top:14px;font-size:.92rem;color:var(--muted)">Want to know when they arrive? <a href="https://wa.me/923098426672?text=Hello%20Tiny%20Artist!%20Please%20tell%20me%20when%20new%20kits%20arrive." target="_blank" rel="noopener" style="text-decoration:underline;font-weight:700">Message us on WhatsApp</a>.</p></section>
+<section class="block"><h2>How It Works</h2><div class="steps">
+<div class="step"><div class="n" style="background:var(--coral)">1</div><h3>Pick Your Figures</h3><p>Choose the shapes you love from all 16 figures.</p></div>
+<div class="step"><div class="n" style="background:var(--sun);color:var(--ink)">2</div><h3>Add Your Colours</h3><p>Select the small or large colour pack and brush.</p></div>
+<div class="step"><div class="n" style="background:var(--mint);color:var(--ink)">3</div><h3>Paint Your Imagination</h3><p>Enjoy a hands-on creative activity, away from screens.</p></div></div></section>
+<section class="block"><h2>Why families love it</h2><div class="benefits">
+<div class="benefit"><p class="ic">📵</p><h3>Screen-free play</h3><p>Hands-on creative time with no screens, batteries or Wi-Fi.</p></div>
+<div class="benefit"><p class="ic">🖐️</p><h3>Hands-on imagination</h3><p>Gripping a brush and filling in details, one figure at a time.</p></div>
+<div class="benefit"><p class="ic">🌈</p><h3>Colour exploration</h3><p>Mixing, choosing and experimenting with real colours.</p></div>
+<div class="benefit"><p class="ic">👨‍👩‍👧</p><h3>Family time</h3><p>An activity parents and children can enjoy side by side.</p></div></div>
+<div class="notice info" style="margin-top:20px"><strong>Delivery &amp; payment:</strong> Cash on Delivery is available across Pakistan, and delivery is free on qualifying orders above ${fmt(settings.threshold)}. Orders are placed via WhatsApp and confirmed by our team in chat.</div></section>`}
+function shopView(q,cat,sort){const ql=(q||"").toLowerCase();let kitList=KITS.filter(k=>(!cat||cat==="Painting Kits")&&(!ql||k.name.toLowerCase().includes(ql)));let list=PRODUCTS.filter(p=>(!cat||p.cat===cat)&&(!ql||p.name.toLowerCase().includes(ql)));
+if(sort==="name"){kitList.sort((a,b)=>a.name.localeCompare(b.name));list.sort((a,b)=>a.name.localeCompare(b.name))}if(sort==="cat")list.sort((a,b)=>a.cat.localeCompare(b.cat));
+const cats=["Painting Kits","Space","Food & Drinks","Ocean","Nature","Everyday Objects"];const total=kitList.length+list.length;
+return `<section class="block"><h2>All Products</h2><p class="sub">Painting kits have fixed prices and every figure costs Rs. 70 — all can be ordered on WhatsApp right away. Colour packs show Price Coming Soon until a price is set.</p>
+<div class="toolbar"><button class="pillbtn ${!cat?"on":""}" onclick="go('#/shop')">All</button>${cats.map(c=>`<button class="pillbtn ${cat===c?"on":""}" onclick="go('#/shop?cat=${encodeURIComponent(c)}')">${c}</button>`).join("")}<span style="flex:1"></span><label>Sort <select onchange="go('#/shop?sort='+this.value${cat?`+'&cat=${encodeURIComponent(cat)}'`:""})"><option value="">Featured</option><option value="name" ${sort==="name"?"selected":""}>Name A–Z</option><option value="cat" ${sort==="cat"?"selected":""}>Category</option></select></label></div>
+${q?`<p style="margin-bottom:14px">Results for “<strong>${esc(q)}</strong>” — ${total} found. <a href="#/shop" data-nav style="text-decoration:underline">Clear</a></p>`:""}
+${total?`<div class="grid">${kitList.map(kitCard).join("")}${list.map(productCard).join("")}</div>`:`<div class="notice info">No products match that search yet. Try another name, like “rocket” or “painting kit”.</div>`}</section>`}
+function productView(p){logEvent("product_view",p.name);let zoom=1;setTimeout(()=>{const g=document.getElementById("stageglyph");window._zoom=z=>{zoom=Math.min(2.2,Math.max(.6,zoom+z));g.style.transform=`scale(${zoom})`};window._reset=()=>{zoom=1;g.style.transform="scale(1)"}},0);
+return `<section class="block"><button class="ghostbtn" style="flex:none" onclick="go('#/shop')">← Back to Shop</button>
+<div class="split" style="margin-top:18px"><div class="panel viewer"><div class="stage" style="background:${p.bg||p.color+"33"}"><span id="stageglyph" style="display:inline-block;transition:transform .2s">${figMedia(p)}</span></div><div class="ctl"><button class="pillbtn" onclick="_zoom(.2)">Zoom +</button><button class="pillbtn" onclick="_zoom(-.2)">Zoom −</button><button class="pillbtn" onclick="_reset()">Reset view</button></div><p style="font-size:.82rem;color:var(--muted);margin-top:10px">Still-image viewer. This figure is shown as a flat image — a genuine 360° view needs a 3D model or photos from every angle, which are not available yet, so we do not pretend otherwise.</p></div>
+<div><span class="cat">${p.cat}</span><h2 style="font-size:2rem;margin:6px 0">${p.name}</h2><p style="color:var(--muted);margin-bottom:14px">${p.desc}</p>${priceHTML(p.slug)}<p style="margin:16px 0;font-size:.93rem">Paint it with either colour pack — both include a red-handled paintbrush with black bristles.</p><button class="btn" onclick="addProduct('${p.slug}')">Add to Cart</button> <button class="btn alt" onclick="go('#/build-your-pack')">Add via Pack Builder</button>
+<div class="notice info" style="margin-top:20px">Cash on Delivery available · Free delivery on orders above ${fmt(settings.threshold)}</div></div></div></section>`}
+</script>
+<script>
+/* ---------- Cart actions ---------- */
+function go(h){location.hash=h}
+function addProduct(slug){const p=PRODUCTS.find(x=>x.slug===slug);const ex=cart.find(i=>i.kind==="product"&&i.slug===slug);if(ex)ex.qty++;else cart.push({kind:"product",slug,name:p.name,qty:1});logEvent("add_to_cart",p.name);saveAll();syncHeader();toast(p.name+" added to your cart.")}
+function addKit(slug){const k=kitBySlug(slug);const ex=cart.find(i=>i.kind==="kit"&&i.slug===slug);if(ex)ex.qty++;else cart.push({kind:"kit",slug,name:k.name,qty:1});logEvent("add_to_cart",k.name);saveAll();syncHeader();toast(k.name+" added to your cart.")}
+function kitView(k){logEvent("product_view",k.name);
+return `<section class="block"><button class="ghostbtn" style="flex:none" onclick="go('#/shop')">← Back to Shop</button>
+<div class="split" style="margin-top:18px"><div class="panel viewer"><div class="stage" style="padding:0;background:#fff">${kitPicture(k,"detailimg")}</div><p style="font-size:.82rem;color:var(--muted);margin-top:10px">${k.dbKit?"Pack contents are listed on this page. Free home delivery is included.":"Poster photo supplied by Tiny Artist. Colours and pieces are exactly as shown."}</p></div>
+<div><span class="cat">${k.cat}</span><h2 style="font-size:2rem;margin:6px 0">${k.name}</h2><p style="color:var(--muted);margin-bottom:14px">${k.desc}</p><span class="price">${pkr(k.price)}</span><ul style="margin:16px 0 16px 18px">${k.contents.map(c=>`<li>${c}</li>`).join("")}</ul><button class="btn" onclick="addKit('${k.slug}')">Add to Cart</button> <button class="btn alt" onclick="go('#/cart')">View Cart</button>
+<div class="notice info" style="margin-top:20px">Cash on Delivery available · Free delivery on orders above ${fmt(settings.threshold)} · Orders are placed via WhatsApp and confirmed in chat.</div></div></div></section>`}
+function validPhone(raw){const d=String(raw||"").replace(/[\s\-()]/g,"");return /^(\+92|0)?3[0-9]{9}$/.test(d)}
+function buildOrderMessage(d,lines,sub,del){return "Hello Tiny Artist! I want to place an order.\n\nCUSTOMER DETAILS:\nName: "+d.name+"\nPhone: "+d.phone+"\nAddress: "+d.address+"\nCity: "+d.city+"\n\nORDER DETAILS:\n"+lines.join("\n")+"\n\nSubtotal: "+pkr(sub)+"\nDelivery Charges: "+del.label+"\nTotal: "+pkr(sub)+"\n\nAdditional Instructions: "+(d.note||"None")+"\n\nPlease confirm my order."}
+function choosePack(id){packSel.pack=id;saveAll();render()}
+function toggleFigure(slug){if(packSel.items[slug])delete packSel.items[slug];else packSel.items[slug]=1;saveAll();render()}
+function packQty(slug,d){packSel.items[slug]=Math.max(1,(packSel.items[slug]||1)+d);saveAll();render()}
+function addCustomPack(){const n=Object.keys(packSel.items).length;if(!n){toast("Pick at least one figure first.");return}const pk=PACKS.find(p=>p.id===packSel.pack);cart.push({kind:"pack",pack:packSel.pack,name:"Custom Pack — "+pk.name,items:Object.assign({},packSel.items),qty:1});logEvent("add_to_cart","Custom Pack ("+n+" figures, "+pk.name+")");packSel={items:{},pack:"small"};saveAll();syncHeader();toast("Your custom pack was added to the cart.");go("#/cart")}
+function buildView(){const sel=packSel.items;const count=Object.values(sel).reduce((a,b)=>a+b,0);
+return `<section class="block"><h2>Build Your Own Pack</h2><p class="sub">Tap figures to add them to your pack, choose a colour pack, and watch your summary update live. <strong>${count} figure${count===1?"":"s"} selected.</strong></p>
+<h3 style="margin-bottom:12px">1 · Choose your figures</h3><div class="selgrid">${PRODUCTS.map(p=>`<div class="selitem ${sel[p.slug]?"sel":""}" onclick="toggleFigure('${p.slug}')" role="button" tabindex="0" aria-pressed="${!!sel[p.slug]}">${figMedia(p)}<strong style="font-size:.9rem">${p.name}</strong><br>${priceHTML(p.slug)}<span class="qrow" onclick="event.stopPropagation()"><button class="qtybtn" onclick="packQty('${p.slug}',-1)">−</button><strong>${sel[p.slug]||1}</strong><button class="qtybtn" onclick="packQty('${p.slug}',1)">+</button></span></div>`).join("")}</div>
+<h3 style="margin:26px 0 12px">2 · Choose your colour pack</h3><div class="packopt">${PACKS.map(p=>packPanel(p,packSel.pack===p.id)).join("")}</div>
+<div class="panel" style="margin-top:24px"><h3>Your pack summary</h3>${count?`<ul style="margin:10px 0 10px 18px">${Object.keys(sel).map(s=>{const p=PRODUCTS.find(x=>x.slug===s);return `<li>${p.name} × ${sel[s]} — ${priceHTML(s)}</li>`}).join("")}<li><strong>${PACKS.find(p=>p.id===packSel.pack).name}</strong> — ${priceHTML(packSel.pack==="small"?"pack-small":"pack-large")}<br><span style="font-size:.88rem;color:var(--muted)">Colours: ${PACKS.find(p=>p.id===packSel.pack).colors.map(c=>c[0]).join(", ")} · + ${BRUSH}</span></li></ul>`:`<p style="color:var(--muted);margin:10px 0">No figures selected yet — tap a figure above to start your pack.</p>`}<button class="btn" onclick="addCustomPack()" ${count?"":"disabled"}>Add Custom Pack to Cart</button></div></section>`}
+function cartLine(i,idx){if(i.kind==="kit"){const k=kitBySlug(i.slug);return `<tr><td><strong>${esc(i.name)}</strong><br><span style="color:var(--muted);font-size:.85rem">Painting Kit</span></td><td><span class="price">${pkr(k.price)}</span></td><td><button class="qtybtn" onclick="cartQty(${idx},-1)">−</button> <strong>${i.qty}</strong> <button class="qtybtn" onclick="cartQty(${idx},1)">+</button></td><td><button class="pillbtn" onclick="cartRemove(${idx})">Remove</button></td></tr>`}
+if(i.kind==="product"){const p=PRODUCTS.find(x=>x.slug===i.slug);return `<tr><td><strong>${p.glyph} ${i.name}</strong><br><span style="color:var(--muted);font-size:.85rem">${p.cat}</span></td><td>${priceHTML(i.slug)}</td><td><button class="qtybtn" onclick="cartQty(${idx},-1)">−</button> <strong>${i.qty}</strong> <button class="qtybtn" onclick="cartQty(${idx},1)">+</button></td><td><button class="pillbtn" onclick="cartRemove(${idx})">Remove</button></td></tr>`}
+const pk=PACKS.find(p=>p.id===i.pack);const figs=Object.keys(i.items).map(s=>{const p=PRODUCTS.find(x=>x.slug===s);return p.name+" × "+i.items[s]}).join(", ");
+return `<tr><td><strong>🎨 Custom Pack</strong><br><span style="font-size:.88rem">${figs}</span><br><span style="color:var(--muted);font-size:.85rem">${pk.name}: ${pk.colors.map(c=>c[0]).join(", ")} + brush</span></td><td>${priceHTML(pk.id==="small"?"pack-small":"pack-large")} <span style="color:var(--muted);font-size:.82rem">+ figure prices</span></td><td><strong>${i.qty}</strong></td><td><button class="pillbtn" onclick="cartRemove(${idx})">Remove</button></td></tr>`}
+function cartQty(idx,d){cart[idx].qty+=d;if(cart[idx].qty<1)cart.splice(idx,1);saveAll();syncHeader();render()}
+function cartRemove(idx){cart.splice(idx,1);saveAll();syncHeader();render();toast("Removed from cart.")}
+function clearCart(){cart=[];saveAll();syncHeader();render()}
+function cartView(){const sub=cartSubtotal();const pct=sub===null?0:Math.min(100,sub/settings.threshold*100);const missing=unpricedItems();
+return `<section class="block"><h2>Your Cart</h2>${cart.length?`<div class="panel"><table><thead><tr><th>Item</th><th>Price</th><th>Qty</th><th></th></tr></thead><tbody>${cart.map(cartLine).join("")}</tbody></table>
+<div style="margin-top:18px">${sub===null?`<div class="notice demo">These items have no price yet: <strong>${missing.map(esc).join(", ")}</strong>. WhatsApp ordering is paused until every item in the cart has a price — remove unpriced items to order the rest, or choose a painting kit with a fixed price.</div>`:`<p><strong>Subtotal:</strong> ${pkr(sub)}</p><p><strong>Delivery:</strong> ${sub>settings.threshold?"FREE":"To Be Confirmed"}</p><p><strong>Total:</strong> ${pkr(sub)}</p>${sub>settings.threshold?`<p style="color:#2e7d4f;font-weight:800">🎉 You qualify for FREE delivery!</p>`:`<p>You are <strong>${fmt(settings.threshold+1-sub)}</strong> away from free delivery (above ${fmt(settings.threshold)}).</p>`}<div class="progress"><div style="width:${pct}%"></div></div>`}
+<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px"><button class="btn" onclick="go('#/checkout')" ${sub===null?"disabled":""}>Order Now</button><button class="ghostbtn" style="flex:none" onclick="clearCart()">Clear cart</button><button class="ghostbtn" style="flex:none" onclick="go('#/shop')">Keep shopping</button></div></div></div>`:`<div class="notice info">Your cart is empty. <a href="#/shop" data-nav style="text-decoration:underline;font-weight:700">Browse the figures</a> or <a href="#/build-your-pack" data-nav style="text-decoration:underline;font-weight:700">build your own pack</a>.</div>`}</section>`}
+function checkoutView(){if(!cart.length)return `<section class="block"><div class="notice info">Your cart is empty, so there is nothing to check out yet.</div></section>`;const sub=cartSubtotal();if(sub===null){const missing=unpricedItems();return `<section class="block"><h2>Checkout</h2><div class="notice demo"><strong>Some items have no price yet:</strong> ${missing.map(esc).join(", ")}. Remove them from your cart to order the rest on WhatsApp, or order a painting kit with a fixed price.</div><button class="btn" onclick="go('#/cart')">Back to Cart</button> <button class="btn alt" onclick="go('#/shop')">Browse Kits</button></section>`}logEvent("checkout_started","");
+const del=deliveryInfo(sub);
+return `<section class="block"><h2>Checkout</h2><div class="notice info"><strong>How ordering works:</strong> fill in your delivery details, then tap <strong>Order via WhatsApp</strong>. WhatsApp opens with your order already written — send it in chat and our team will confirm your order. Opening WhatsApp does not confirm the order by itself.</div><div class="split"><form id="coform" class="panel" novalidate><div class="field"><label for="coname">Your name</label><input id="coname" required autocomplete="name" maxlength="80"><p class="err" id="err-name"></p></div><div class="field"><label for="cophone">Mobile number</label><input id="cophone" required type="tel" autocomplete="tel" maxlength="20" placeholder="03XX XXXXXXX"><p class="err" id="err-phone"></p></div><div class="field"><label for="cocity">City</label><input id="cocity" required maxlength="60"><p class="err" id="err-city"></p></div><div class="field"><label for="coaddr">Delivery address</label><textarea id="coaddr" rows="3" required maxlength="300"></textarea><p class="err" id="err-addr"></p></div><div class="field"><label for="conote">Additional instructions (optional)</label><input id="conote" maxlength="200"></div><div class="field"><label>Payment</label><p>💵 Cash on Delivery — pay when your order arrives.</p></div><button class="btn" id="waorderbtn" type="submit">Order via WhatsApp</button></form>
+<div class="panel"><h3>Order summary</h3><ul style="margin:12px 0 12px 18px">${cartMessageLines().map(l=>`<li>${esc(l)}</li>`).join("")}</ul><p><strong>Subtotal:</strong> ${pkr(sub)}<br><strong>Delivery:</strong> ${del.label}<br><strong>Total:</strong> ${pkr(sub)}</p><p style="font-size:.88rem;color:var(--muted);margin-top:10px">Guest checkout — no account or sign-up needed. Your cart is kept until the order is saved.</p></div></div></section>`}
+function placeOrder(e){e.preventDefault();if(waSubmitting)return;
+const d={name:document.getElementById("coname").value.trim(),phone:document.getElementById("cophone").value.trim(),city:document.getElementById("cocity").value.trim(),address:document.getElementById("coaddr").value.trim(),note:document.getElementById("conote").value.trim()};
+const errs={};
+if(d.name.length<2)errs.name="Please enter your full name.";
+if(!validPhone(d.phone))errs.phone="Please enter a valid Pakistani mobile number, e.g. 03XX XXXXXXX.";
+if(d.city.length<2)errs.city="Please enter your city.";
+if(d.address.length<8)errs.addr="Please enter your complete delivery address.";
+[["name","err-name"],["phone","err-phone"],["city","err-city"],["addr","err-addr"]].forEach(([k,id])=>{const el=document.getElementById(id);if(errs[k]){el.textContent=errs[k];el.style.display="block"}else{el.textContent="";el.style.display="none"}});
+if(Object.keys(errs).length){const first=document.getElementById(errs.name?"coname":errs.phone?"cophone":errs.city?"cocity":"coaddr");if(first)first.focus();return}
+const sub=cartSubtotal();if(sub===null){toast("Some items have no price yet. Please remove them before ordering.");go("#/cart");return}
+waSubmitting=true;const btn=document.getElementById("waorderbtn");if(btn){btn.disabled=true;btn.textContent="Opening WhatsApp…"}
+const lines=cartMessageLines();const del=deliveryInfo(sub);const msg=buildOrderMessage(d,lines,sub,del);
+submitOrderToBackend(d,cart.slice());
+const url="https://wa.me/"+WA_NUMBER+"?text="+encodeURIComponent(msg);
+const o={id:"TA-"+Date.now().toString(36).toUpperCase()+"-"+Math.floor(100+Math.random()*900),name:d.name,phone:d.phone,city:d.city,address:d.address,note:d.note,items:lines.join("; "),total:sub,delivery:del.label,status:"Pending Confirmation",at:Date.now(),waUrl:url};
+orders.unshift(o);cart=[];logEvent("order_created",o.id);saveAll();syncHeader();
+try{sessionStorage.setItem("ta-last-order",o.id);sessionStorage.setItem("ta-last-wa",url)}catch(err){}
+location.href=url;
+setTimeout(()=>{waSubmitting=false;go("#/order-confirmation")},1600)}
+function confirmView(){let id="";try{id=sessionStorage.getItem("ta-last-order")||""}catch(err){}const o=orders.find(x=>x.id===id);let wa="";try{wa=sessionStorage.getItem("ta-last-wa")||(o&&o.waUrl)||""}catch(err){}
+return `<section class="block"><div class="panel" style="text-align:center;padding:40px 24px"><p style="font-size:2.6rem">💬</p><h2>Order Sent to WhatsApp</h2>${o?`<p style="margin:12px 0">Thank you, ${esc(o.name.split(" ")[0])}. Your order <strong>${o.id}</strong> is saved as <strong>Pending Confirmation</strong>.</p><p style="color:var(--muted)">${esc(o.items)}</p><p style="margin-top:10px"><strong>Total (Cash on Delivery):</strong> ${pkr(o.total)} · Delivery: ${esc(o.delivery||"To Be Confirmed")}</p>`:`<p style="margin:12px 0">Your order details were prepared for WhatsApp.</p>`}<div class="notice info" style="text-align:left;margin-top:18px">Opening WhatsApp does <strong>not</strong> confirm your order. Please send the message in WhatsApp — the Tiny Artist team will confirm your order in chat.${wa?` If WhatsApp did not open, tap the button below.`:""}</div>${wa?`<a class="btn" href="${wa}" target="_blank" rel="noopener">Open WhatsApp Order Again</a> `:""}<button class="btn alt" onclick="go('#/shop')">Keep Shopping</button></div></section>`}
+function aboutView(){return `<section class="block"><h2>About Tiny Artist</h2><div class="panel"><p>Tiny Artist is a little world of imagination, creativity and colour. We believe that the simplest moments can become memorable creative experiences. Our paintable figures give children an opportunity to choose colours, explore ideas and make every little creation their own.</p><div class="benefits" style="margin-top:20px"><div class="benefit"><h3>📵 Screen-free creative play</h3><p>Real figures, real paints, real hands.</p></div><div class="benefit"><h3>🌈 Colourful imagination</h3><p>Every figure starts blank and ends up one of a kind.</p></div><div class="benefit"><h3>🖐️ Hands-on activities</h3><p>Pick it up, paint it, display it proudly.</p></div><div class="benefit"><h3>💛 Personal expression</h3><p>There is no wrong colour for a whale.</p></div></div></div>
+<div class="panel" style="margin-top:20px"><h3>Created and developed by ONE.6 Agency</h3><p style="margin:10px 0">Tiny Artist's digital experience was created by ONE.6 Agency, a creative digital agency building ambitious websites, digital experiences and technology-driven solutions.</p><a class="btn small" href="https://0ne-6-agency.netlify.app/" target="_blank" rel="noopener">Explore ONE.6 Agency</a> <a class="btn small alt" style="margin-left:8px" href="https://0ne-6-agency.netlify.app/" target="_blank" rel="noopener">Start a Project</a><p style="margin-top:14px">Contact Tiny Artist: <a href="mailto:musamahmood20002512@gmail.com" style="text-decoration:underline;font-weight:700">musamahmood20002512@gmail.com</a></p></div></section>`}
+function faqView(){return `<section class="block"><h2>Frequently Asked Questions</h2><p class="sub">Honest answers — no claims we cannot support.</p>${FAQS.map(f=>`<details class="faq"><summary>${f[0]}</summary><p>${f[1]}</p></details>`).join("")}</section>`}
+function contactView(){return `<section class="block"><h2>Contact</h2><div class="split"><div class="panel"><h3>WhatsApp &amp; email</h3><p style="margin:10px 0">Fastest for orders and questions:</p><p><a class="btn small" href="https://wa.me/${WA_NUMBER}?text=${encodeURIComponent("Hello Tiny Artist! I have a question.")}" target="_blank" rel="noopener">WhatsApp ${WA_DISPLAY}</a></p><p style="margin-top:16px">Email: <a href="mailto:musamahmood20002512@gmail.com" style="text-decoration:underline;font-weight:700">musamahmood20002512@gmail.com</a></p></div><div class="panel"><h3>Delivery</h3><p style="margin-top:10px">Cash on Delivery across Pakistan. Free delivery on qualifying orders above ${fmt(settings.threshold)}. Orders are placed via WhatsApp and confirmed by our team in chat.</p><h3 style="margin-top:18px">Website by</h3><p style="margin-top:6px"><a href="https://0ne-6-agency.netlify.app/" target="_blank" rel="noopener" style="text-decoration:underline;font-weight:700">ONE.6 Agency</a></p></div></div></section>`}
+/* ---------- Admin ---------- */
+function adminGate(){if(adminOn)return adminView();return `<section class="block"><h2>Admin</h2><div class="split"><div class="panel"><h3>Real admin panel</h3><p style="margin:10px 0">The real admin panel lives at <strong>/admin</strong> on this website. It asks for the security access code, then your admin account email and password, and the server checks the admin allowlist before letting anyone in.</p><a class="btn" href="/admin">Open the Admin Panel</a></div>
+<div class="panel"><h3>Local preview (this device only)</h3><p style="margin:10px 0">Explore the dashboard with data from this browser only — prices, orders and activity stored on this device. This preview authenticates nobody and enforces no allowlist; it cannot see other customers’ data.</p><button class="btn" onclick="enterAdmin()">Open Local Preview</button></div></div></section>`}
+function enterAdmin(){adminOn=true;sessionStorage.setItem("ta-admin","1");go("#/admin")}
+function exitAdmin(){adminOn=false;sessionStorage.removeItem("ta-admin");go("#/admin")}
+function adminView(tab){tab=tab||"overview";const views=events.filter(e=>e.type==="product_view").length,adds=events.filter(e=>e.type==="add_to_cart").length,starts=events.filter(e=>e.type==="checkout_started").length,created=events.filter(e=>e.type==="order_created").length;
+const tabs=[["overview","Overview"],["products","Products"],["discounts","Discounts"],["banners","Banners"],["orders","Orders"],["carts","Customers / Cart Activity"],["settings","Settings"],["danger","Danger Zone"]];
+let body="";
+if(tab==="overview"){const st=s=>orders.filter(o=>o.status===s).length;body=`<div class="notice demo"><strong>Local preview only:</strong> these numbers come from this browser only. There is no shared database connected yet, so customers, orders and visits from other devices are not shown here. Shared analytics require the backend described in SETUP.md.</div><div class="metric"><div class="m"><b>${orders.length}</b><span>Orders on this device</span></div><div class="m"><b>${st("Pending Confirmation")+st("Pending")}</b><span>Pending confirmation</span></div><div class="m"><b>${st("Confirmed")}</b><span>Confirmed</span></div><div class="m"><b>${st("Cancelled")}</b><span>Cancelled</span></div><div class="m"><b>${views}</b><span>Product views (this device)</span></div><div class="m"><b>${adds}</b><span>Add-to-cart events (this device)</span></div><div class="m"><b>${starts}</b><span>Checkouts started (this device)</span></div><div class="m"><b>${created}</b><span>Orders sent to WhatsApp (this device)</span></div><div class="m"><b>${PRODUCTS.length+KITS.length}</b><span>Products listed</span></div><div class="m"><b>${orders.some(o=>typeof o.total==="number")?fmt(orders.reduce((s,o)=>s+(o.total||0),0)):"—"}</b><span>Order value on this device</span></div></div><div class="panel"><h3>What is missing?</h3><p style="margin-top:8px">Total customers, unique visitors and returning visitors cannot be known without a backend. Do not treat this device’s numbers as store totals.</p></div>`}
+if(tab==="products"){body=`<div class="panel"><h3>Products — prices</h3><p style="color:var(--muted);font-size:.9rem;margin:6px 0 12px">Kit prices are fixed from the posters. Every figure costs Rs. 70 — set a different price here to override it on this device, or leave it empty to use Rs. 70. Pack prices save in this browser only; leave a pack price empty to keep “Price Coming Soon”.</p><table><thead><tr><th>Product</th><th>Category</th><th>Price (Rs.)</th><th></th></tr></thead><tbody>${KITS.map(k=>`<tr><td>🎨 <strong>${k.name}</strong></td><td>${k.cat}</td><td><strong>${fmt(k.price)}</strong> <span style="color:var(--muted);font-size:.82rem">fixed</span></td><td></td></tr>`).join("")}${PRODUCTS.map(p=>`<tr><td>${p.glyph} <strong>${p.name}</strong></td><td>${p.cat}</td><td><input type="number" min="0" id="price-${p.slug}" value="${priceOf(p.slug)??""}" placeholder="Not set" style="width:120px;border:1.5px solid var(--line);border-radius:8px;padding:7px 9px"></td><td><button class="pillbtn" onclick="savePrice('${p.slug}')">Save</button></td></tr>`).join("")}<tr><td>🎨 <strong>Small Colour Pack</strong></td><td>Colour Pack</td><td><input type="number" min="0" id="price-pack-small" value="${priceOf("pack-small")??""}" placeholder="Not set" style="width:120px;border:1.5px solid var(--line);border-radius:8px;padding:7px 9px"></td><td><button class="pillbtn" onclick="savePrice('pack-small')">Save</button></td></tr><tr><td>🎨 <strong>Large Colour Pack</strong></td><td>Colour Pack</td><td><input type="number" min="0" id="price-pack-large" value="${priceOf("pack-large")??""}" placeholder="Not set" style="width:120px;border:1.5px solid var(--line);border-radius:8px;padding:7px 9px"></td><td><button class="pillbtn" onclick="savePrice('pack-large')">Save</button></td></tr></tbody></table></div>`}
+if(tab==="discounts"){body=`<div class="panel"><h3>Discounts</h3><p style="margin:10px 0">No discounts are configured. Create percentage or fixed-amount offers here in the production version — the demo does not invent offers or fake sale prices.</p><span class="badge">NONE ACTIVE</span></div>`}
+if(tab==="banners"){body=`<div class="panel"><h3>Banners</h3><table><thead><tr><th>Campaign</th><th>Status</th></tr></thead><tbody><tr><td>14 August Sale</td><td><span class="badge">DRAFT — not shown on storefront</span></td></tr><tr><td>Eid Sale</td><td><span class="badge">DRAFT — not shown on storefront</span></td></tr></tbody></table><p style="margin-top:10px;color:var(--muted);font-size:.9rem">Activate a dated banner and it appears on the storefront until its end date, then stops automatically. Drafts are never displayed.</p></div>`}
+if(tab==="orders"){body=`<div class="panel"><h3>Orders <span class="badge sample">THIS DEVICE ONLY</span></h3>${orders.length?`<table><thead><tr><th>Order</th><th>Customer</th><th>Items</th><th>Total</th><th>Status</th></tr></thead><tbody>${orders.map((o,ix)=>`<tr><td><strong>${o.id}</strong><br><span style="font-size:.82rem;color:var(--muted)">${new Date(o.at).toLocaleDateString("en-PK")}</span></td><td>${esc(o.name)}<br><span style="font-size:.85rem;color:var(--muted)">${esc(o.phone)} · ${esc(o.city)}</span>${o.address?`<br><span style="font-size:.85rem;color:var(--muted)">${esc(o.address)}</span>`:""}</td><td style="font-size:.88rem">${esc(o.items)}</td><td>${o.total!==null&&o.total!==undefined?fmt(o.total):"Price not set"}</td><td><select onchange="orderStatus(${ix},this.value)">${["Pending Confirmation","Pending","Confirmed","Processing","Shipped","Delivered","Cancelled"].map(s=>`<option ${o.status===s?"selected":""}>${s}</option>`).join("")}</select></td></tr>`).join("")}</tbody></table>`:`<p style="margin-top:10px">No orders yet in this browser. Orders placed through WhatsApp checkout on this device will appear here.</p>`}</div>`}
+if(tab==="carts"){body=`<div class="notice info"><strong>Privacy rule:</strong> an anonymous visitor’s name or phone number cannot be obtained from a visit or an add-to-cart. Customers appear here only after they voluntarily give details at checkout on this device.</div><div class="panel"><table><thead><tr><th>Cart / Order</th><th>Customer</th><th>Items</th><th>Status</th></tr></thead><tbody>${cart.length?`<tr><td>Current cart (this device)</td><td>Anonymous visitor <span class="badge anon">ANONYMOUS</span></td><td>${esc(cart.map(i=>i.name+" × "+i.qty).join(", "))}</td><td>In progress</td></tr>`:""}${orders.map(o=>`<tr><td>${o.id}</td><td>${esc(o.name)} (gave details at checkout)</td><td>${esc(o.items)}</td><td>${esc(o.status)}</td></tr>`).join("")}</tbody></table>${!cart.length&&!orders.length?`<p style="margin-top:10px">No cart activity on this device yet.</p>`:""}</div>`}
+if(tab==="danger"){body=`<div class="panel"><h3>Emergency: Delete Website</h3><p style="margin:10px 0">When activated, the public website shows a <strong>completely blank white page</strong> — no logo, text, navigation, products, or buttons. Source code, database records, and the GitHub repository are <strong>not</strong> deleted. Recovery is only via the separate recovery page.</p><p style="margin:10px 0"><strong>Current mode:</strong> ${BACKEND_CONFIG.enabled?"Server-controlled (backend connected).":"Local preview only — no backend is connected, so activation affects <strong>this browser only</strong>. The server-controlled version activates from the database once Phase 2 is wired (see SETUP.md)."}</p><p style="margin:10px 0">Recovery page: <a href="recovery.html" style="text-decoration:underline;font-weight:700">recovery.html</a> — bookmark it before activating.</p><div class="field"><label for="deltype">Type <strong>DELETE</strong> to confirm</label><input id="deltype" autocomplete="off" maxlength="10"></div><div class="field"><label style="display:flex;gap:8px;align-items:center;font-weight:700"><input type="checkbox" id="delack" style="width:auto"> I understand the public site will go blank until restored via the recovery page.</label></div><p class="err" id="delerr"></p><button class="btn" style="background:#b3261e" onclick="requestDeleteWebsite()">Delete Website</button> <button class="ghostbtn" style="flex:none" onclick="restoreLocalWebsite()">Restore on this device</button></div>`}
+if(tab==="settings"){body=`<form class="panel" id="setform"><h3>Store settings</h3><div class="field" style="margin-top:12px"><label for="sfree">Free-delivery threshold (Rs.)</label><input id="sfree" type="number" min="0" value="${settings.threshold}"></div><div class="field"><label for="sann">Announcement bar message</label><input id="sann" value="${esc(settings.announce[0])}"></div><p style="font-size:.9rem;color:var(--muted)">Currency: PKR (Rs.) · Cash on Delivery: enabled · Contact email: musamahmood20002512@gmail.com · WhatsApp orders: +92 309 8426672</p><button class="btn small" type="submit">Save Settings</button> <button class="ghostbtn" style="flex:none" type="button" onclick="resetDemo()">Reset Local Data</button></form>`;setTimeout(()=>{document.getElementById("setform").onsubmit=e=>{e.preventDefault();settings.threshold=Math.max(0,Number(document.getElementById("sfree").value)||2000);settings.announce[0]=document.getElementById("sann").value||settings.announce[0];saveAll();syncHeader();toast("Settings saved — the storefront is updated.");render()}},0)}
+return `<section class="block"><h2>Admin Dashboard <span class="badge sample">LOCAL PREVIEW</span></h2><div class="adminbar">${tabs.map(t=>`<button class="pillbtn ${tab===t[0]?"on":""}" onclick="go('#/admin/${t[0]}')">${t[1]}</button>`).join("")}<span style="flex:1"></span><button class="pillbtn" onclick="exitAdmin()">Sign Out</button></div>${body}</section>`}
+function confirmDeletion(typed,ack){return typed==="DELETE"&&ack===true}
+async function requestDeleteWebsite(){const typed=document.getElementById("deltype").value;const ack=document.getElementById("delack").checked;const err=document.getElementById("delerr");if(!confirmDeletion(typed,ack)){err.textContent="Type DELETE exactly and tick the confirmation box to proceed.";err.style.display="block";return}err.textContent="";err.style.display="none";if(!window.confirm("Delete the public website? The site will show a blank white page until restored via recovery.html. This cannot be undone from the admin panel."))return;if(BACKEND_CONFIG.enabled&&BACKEND_CONFIG.statusApi){const headers={"Content-Type":"application/json"};try{if(window.supabaseClient){const s=await window.supabaseClient.auth.getSession();const t=s&&s.data&&s.data.session&&s.data.session.access_token;if(t)headers.Authorization="Bearer "+t}}catch(e){}if(!headers.Authorization){err.textContent="No signed-in admin session was found, so the server was NOT changed. Sign in as an admin and try again, or use recovery.html and the Supabase dashboard (see SETUP.md).";err.style.display="block";return}try{const r=await fetch(BACKEND_CONFIG.statusApi,{method:"POST",headers:headers,body:JSON.stringify({deactivated:true,reason:"Emergency delete from admin panel"})});if(!r.ok)throw new Error("status "+r.status);siteDeactivated=true;applyBlankPage();return}catch(e){err.textContent="Server deactivation failed ("+e.message+"). The site was NOT deactivated. Check the backend and try again.";err.style.display="block";return}}LS.set("deactivated",true);siteDeactivated=true;logEvent("site_deactivated","local preview");saveAll();applyBlankPage()}
+function restoreLocalWebsite(){LS.set("deactivated",false);siteDeactivated=false;saveAll();toast("Website restored on this device.");render()}
+function savePrice(key){const v=document.getElementById("price-"+key).value;if(v===""||Number(v)<=0)delete prices[key];else prices[key]=Number(v);saveAll();toast("Price saved — the storefront is updated.");render()}
+function orderStatus(ix,v){orders[ix].status=v;saveAll();toast("Order status updated to "+v+".")}
+function resetDemo(){localStorage.clear();location.hash="#/";location.reload()}
+/* ---------- Router ---------- */
+function render(){if(siteDeactivated){applyBlankPage();return}const h=(location.hash||"#/").slice(1);const [path,qs]=h.split("?");const q=new URLSearchParams(qs||"");const parts=path.split("/").filter(Boolean);
+window.scrollTo(0,0);syncHeader();waSubmitting=false;
+if(parts.length===0){app.innerHTML=homeView()}
+else if(parts[0]==="shop"){app.innerHTML=shopView(q.get("q")||"",q.get("cat")||"",q.get("sort")||"")}
+else if(parts[0]==="product"){const k=kitBySlug(parts[1]);const p=PRODUCTS.find(x=>x.slug===parts[1]);app.innerHTML=k?kitView(k):p?productView(p):`<section class="block"><div class="notice info">That product could not be found. <a href="#/shop" data-nav style="text-decoration:underline">Back to Shop</a></div></section>`}
+else if(parts[0]==="build-your-pack"){app.innerHTML=buildView()}
+else if(parts[0]==="cart"){app.innerHTML=cartView()}
+else if(parts[0]==="checkout"){app.innerHTML=checkoutView();const f=document.getElementById("coform");if(f)f.onsubmit=placeOrder}
+else if(parts[0]==="order-confirmation"){app.innerHTML=confirmView()}
+else if(parts[0]==="about"){app.innerHTML=aboutView()}
+else if(parts[0]==="faq"){app.innerHTML=faqView()}
+else if(parts[0]==="contact"){app.innerHTML=contactView()}
+else if(parts[0]==="admin"){app.innerHTML=adminOn?adminView(parts[1]||"overview"):adminGate()}
+else{app.innerHTML=homeView()}
+document.querySelectorAll("[data-nav]").forEach(a=>a.addEventListener("click",()=>document.getElementById("mainnav").classList.remove("open")))}
+window.addEventListener("hashchange",render);
+bootSite();
+</script>
+</body>
+</html>
