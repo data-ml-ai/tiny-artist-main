@@ -6,6 +6,7 @@
 <title>Tiny Artist — A whole world of screen-free play.</title>
 <meta name="description" content="Tiny Artist: paintable creative figures and colour kits for children in Pakistan. Build your own pack, Cash on Delivery, free delivery on orders above Rs. 2,000.">
 <link rel="icon" type="image/png" href="assets/logo.png">
+<link rel="preconnect" href="https://aljtrhwotbhckujvuctx.supabase.co" crossorigin>
 <meta name="theme-color" content="#FFF8EE">
 <style>
 :root{--canvas:#FFF8EE;--ink:#263448;--coral:#F17F70;--sun:#F5CB68;--mint:#92D8C2;--sky:#A9D7EF;--lilac:#C5B2E8;--white:#fff;--muted:#5b6b82;--line:#f0e3d3;--radius:20px}
@@ -142,7 +143,7 @@ footer li{list-style:none;margin-bottom:6px;font-size:.93rem}
 <body>
 <div class="announce" id="announce">Creative play, away from screens.</div>
 <header class="site"><div class="wrap nav">
-  <a class="brand" href="#/" data-nav><img class="logo" src="assets/logo.png" alt="Tiny Artist logo" width="40" height="40">TINY&nbsp;ARTIST</a>
+  <a class="brand" href="#/" data-nav><picture><source srcset="assets/logo.webp" type="image/webp"><img class="logo" src="assets/logo.png" alt="Tiny Artist logo" width="40" height="40" decoding="async"></picture>TINY&nbsp;ARTIST</a>
   <button class="burger" id="burger" aria-label="Open menu">☰</button>
   <nav id="mainnav" aria-label="Main">
     <a href="#/" data-nav>Home</a><a href="#/shop" data-nav>Shop</a><a href="#/build-your-pack" data-nav>Build Your Own Pack</a><a href="#/about" data-nav>About Us</a><a href="#/faq" data-nav>FAQ</a><a href="#/contact" data-nav>Contact</a>
@@ -283,7 +284,7 @@ function homeView(){return `
 <p class="lead">Discover cute little figures, pick your favourite colours and create something that is completely yours.</p>
 <button class="btn" onclick="go('#/build-your-pack')">Build Your Own Pack</button><button class="btn alt" onclick="go('#/shop')">Explore All Figures</button>
 <div class="chips"><span class="chip">🎨 16 paintable figures</span><span class="chip">💵 Cash on Delivery</span><span class="chip">🚚 Free delivery above ${fmt(settings.threshold)}</span><span class="chip">📵 No screens, no batteries</span></div>
-</div><figure class="hero-img"><picture><source srcset="assets/collection.webp" type="image/webp"><img src="collection.jpg" alt="The Tiny Artist collection: sixteen unpainted paintable figures with paint pots and brushes" loading="lazy" decoding="async"></picture><figcaption>The full Tiny Artist collection — 16 figures, paints and brushes, ready to paint.</figcaption></figure></div></section>
+</div><figure class="hero-img"><picture><source srcset="assets/collection.webp" type="image/webp"><img src="collection.jpg" alt="The Tiny Artist collection: sixteen unpainted paintable figures with paint pots and brushes" fetchpriority="high" decoding="async"></picture><figcaption>The full Tiny Artist collection — 16 figures, paints and brushes, ready to paint.</figcaption></figure></div></section>
 <section class="block"><h2>Painting Kits</h2><p class="sub">Complete kits with figures, colours and brushes — ready to paint. Prices include everything shown on the poster.</p><div class="grid">${KITS.map(kitCard).join("")}</div></section>
 <section class="block"><h2>Shop by Figure</h2><p class="sub">Every figure starts plain white and becomes whatever your little artist imagines. Tap View for a closer look, or add straight to your cart.</p><div class="grid">${PRODUCTS.map(productCard).join("")}</div></section>
 <section class="block" style="background:#fff;border-radius:28px;padding:36px 28px"><h2>Your Creativity. Your Collection.</h2><p class="sub">Choose your favourite figures, add a small or large colour pack, and we will put your personal kit together as one custom pack.</p><button class="btn" onclick="go('#/build-your-pack')">Build My Pack</button></section>
